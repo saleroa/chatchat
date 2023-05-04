@@ -1,0 +1,33 @@
+logger:
+  loglevel: "debug"
+  savePath: "log"
+  maxSize: 5
+  maxAge: 400
+  maxBackups: 1000
+  isCompress: true
+
+database:
+  mysql:
+    addr: localhost
+    port: 3306
+    username: root
+    password: wzy20040525
+    db: zhihu
+    charset: utf8mb4
+    connMaxIdleTime: 1h
+    connMaxLifeTime: 1h
+    place: Asia%2FShanghai
+    maxIdleConns: 10
+    maxOpenConns: 5
+
+  redis:
+    addr: localhost
+    port: 6379
+    username: root
+    password:
+    db: 0
+    poolSize: 10000
+
+server:
+  mode: "debug"
+  port: 8088
