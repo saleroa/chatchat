@@ -11,7 +11,7 @@ type User struct {
 	NewPassword string `form:"newPassword" json:"newPassword"`
 	Nickname    string `form:"nickname" json:"nickname" `
 	ID          int64  `form:"id" json:"id" `
-	//CaptchaID  string    `form:"captchaID" json:"captchaID" `
+	MailID      string `form:"mailID" json:"mailID" `
 	//VIP          int       `form:"vip" json:"vip" `
 	Avatar       string    `form:"avatar" json:"avatar" `
 	FriendID     int64     `form:"friendID" json:"friendID" `

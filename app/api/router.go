@@ -18,6 +18,7 @@ func InitRouter() error {
 	r.Use(middleware.CORS())
 	r.POST("/register", register)
 	r.POST("/login", login)
+	r.POST("/verificationID", SendMail)
 	UserRouter := r.Group("/user")
 	{
 		UserRouter.Use(middleware.JWTAuthMiddleware())
@@ -35,27 +36,19 @@ func InitRouter() error {
 	})
 
 	r.GET("/oauth2", func(c *gin.Context) {
-		c.Request.ParseForm()
-		state, _ := c.GetQuery("state")
-		if state != "xyz" {
-			http.Error(c.Writer, "State invalid", http.StatusBadRequest)
+		if globalToken == nil {
+			http.Redirect(c.Writer, c.Request, "/", http.StatusFound)
 			return
 		}
-		code, _ := c.GetQuery("code")
-		if code == "" {
-			http.Error(c.Writer, "Code not found", http.StatusBadRequest)
-			return
-		}
-		token, err := config.Exchange(context.Background(), code, oauth2.SetAuthURLParam("code_verifier", "s256example"))
-		if err != nil {
-			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		globalToken = token
 
-		e := json.NewEncoder(c.Writer)
-		e.SetIndent("", "  ")
-		e.Encode(token)
+		resp, err := http.Get(fmt.Sprintf("%s/test?access_token=%s", authServerURL, globalToken.AccessToken))
+		if err != nil {
+			http.Error(c.Writer, err.Error(), http.StatusBadRequest)
+			return
+		}
+		defer resp.Body.Close()
+
+		io.Copy(c.Writer, resp.Body)
 	})
 
 	http.HandleFunc("oauth2/refresh", func(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +76,7 @@ func InitRouter() error {
 			return
 		}
 
-		resp, err := http.Get(fmt.Sprintf("%s/test?access_token=%s", authServerURL, globalToken.AccessToken))
+		resp, err := http.Get(fmt.Sprintf("%s/verify?access_token=%s", authServerURL, globalToken.AccessToken))
 		if err != nil {
 			http.Error(c.Writer, err.Error(), http.StatusBadRequest)
 			return

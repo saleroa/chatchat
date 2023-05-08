@@ -8,11 +8,17 @@ import (
 var user *model.User
 
 func AddUserCheck(username, password, nickname string) (bool, string) {
-	if len(username) < 6 || len(username) > 10 {
-		return false, "length of the username is wrong "
+	var i int
+	for k, v := range username {
+		if v == '@' {
+			i = k
+			break
+		}
 	}
-	if !utils.IsNum(username) {
-		return false, "the username has covered characters"
+	num := username[:i]
+	mail := username[i:]
+	if !utils.IsNum(num) || mail != "@qq.com" {
+		return false, "it is not the format of qq's email"
 	}
 	if len(password) < 10 || len(password) > 20 {
 		return false, "length of the password is wrong "

@@ -5,6 +5,7 @@ import (
 	"chatchat/model"
 	"context"
 	"github.com/go-redis/redis/v8"
+	"time"
 )
 
 var user *model.User
@@ -38,6 +39,19 @@ func HGet(ctx context.Context, key, field string) (interface{}, error) {
 func HSet(ctx context.Context, key string, value ...interface{}) error {
 	SetKV := global.Rdb.HSet(ctx, key, value)
 	return SetKV.Err()
+}
+
+func Set(ctx context.Context, key string, value interface{}, time time.Duration) error {
+	SetKV := global.Rdb.Set(ctx, key, value, time)
+	return SetKV.Err()
+}
+
+func Get(ctx context.Context, key string) (string, error) {
+	GetKey := global.Rdb.Get(ctx, key)
+	if GetKey.Err() != nil {
+		return "", GetKey.Err()
+	}
+	return GetKey.Val(), nil
 }
 
 func ZSetUserID(ctx context.Context, username string) error {
