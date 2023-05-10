@@ -15,7 +15,7 @@ var (
 		ClientID:     "test_client_1",
 		ClientSecret: "test_secret_1",
 		Scopes:       []string{"all"},
-		RedirectURL:  "http://localhost:8088/index",
+		RedirectURL:  "http://localhost:8088/oauth2",
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  authServerURL + "/oauth/authorize",
 			TokenURL: authServerURL + "/oauth/token",

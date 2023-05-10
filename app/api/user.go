@@ -99,7 +99,11 @@ func login(c *gin.Context) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 	tokenString, _ := token.SignedString(middleware.Secret)
-	utils.ResponseSuccess(c, tokenString)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  200,
+		"message": "login success",
+		"token":   tokenString,
+	})
 	return
 }
 
@@ -163,7 +167,6 @@ func ChangeNickname(c *gin.Context) {
 	id, _ := c.Get("id")
 	//c.Param(id.(string))
 	var user model.User
-	c.ShouldBind(&user)
 	nickname := user.Nickname
 	flag1, msg := dao.AddUserCheck("7777777777", "1234512345w", nickname)
 	if !flag1 {

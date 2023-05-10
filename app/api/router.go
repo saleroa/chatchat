@@ -28,7 +28,7 @@ func InitRouter() error {
 		UserRouter.POST("/:uid/getUser", GetUser)
 	}
 
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/oauth2login", func(c *gin.Context) {
 		u := config.AuthCodeURL("xyz",
 			oauth2.SetAuthURLParam("code_challenge", genCodeChallengeS256("s256example")),
 			oauth2.SetAuthURLParam("code_challenge_method", "S256"))
@@ -36,43 +36,51 @@ func InitRouter() error {
 	})
 
 	r.GET("/oauth2", func(c *gin.Context) {
-		if globalToken == nil {
-			http.Redirect(c.Writer, c.Request, "/", http.StatusFound)
+		c.Request.ParseForm()
+		state := c.Request.Form.Get("state")
+		if state != "xyz" {
+			http.Error(c.Writer, "State invalid", http.StatusBadRequest)
 			return
 		}
-
-		resp, err := http.Get(fmt.Sprintf("%s/test?access_token=%s", authServerURL, globalToken.AccessToken))
+		code := c.Request.Form.Get("code")
+		if code == "" {
+			http.Error(c.Writer, "Code not found", http.StatusBadRequest)
+			return
+		}
+		token, err := config.Exchange(context.Background(), code, oauth2.SetAuthURLParam("code_verifier", "s256example"))
 		if err != nil {
-			http.Error(c.Writer, err.Error(), http.StatusBadRequest)
+			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer resp.Body.Close()
+		globalToken = token
 
-		io.Copy(c.Writer, resp.Body)
+		e := json.NewEncoder(c.Writer)
+		e.SetIndent("", "  ")
+		e.Encode(token)
 	})
 
-	http.HandleFunc("oauth2/refresh", func(w http.ResponseWriter, r *http.Request) {
+	r.GET("oauth2/refresh", func(c *gin.Context) {
 		if globalToken == nil {
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(c.Writer, c.Request, "/", http.StatusFound)
 			return
 		}
 
 		globalToken.Expiry = time.Now()
 		token, err := config.TokenSource(context.Background(), globalToken).Token()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		globalToken = token
-		e := json.NewEncoder(w)
+		e := json.NewEncoder(c.Writer)
 		e.SetIndent("", "  ")
 		e.Encode(token)
 	})
 
 	r.GET("oauth2/try", func(c *gin.Context) {
 		if globalToken == nil {
-			http.Redirect(c.Writer, c.Request, "/", http.StatusFound)
+			http.Redirect(c.Writer, c.Request, "/oauth2login", http.StatusFound)
 			return
 		}
 
@@ -99,7 +107,7 @@ func InitRouter() error {
 		e.Encode(token)
 	})
 
-	http.HandleFunc("oauth2/client", func(w http.ResponseWriter, r *http.Request) {
+	r.GET("oauth2/client", func(c *gin.Context) {
 		cfg := clientcredentials.Config{
 			ClientID:     config.ClientID,
 			ClientSecret: config.ClientSecret,
@@ -108,11 +116,11 @@ func InitRouter() error {
 
 		token, err := cfg.Token(context.Background())
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		e := json.NewEncoder(w)
+		e := json.NewEncoder(c.Writer)
 		e.SetIndent("", "  ")
 		e.Encode(token)
 	})
