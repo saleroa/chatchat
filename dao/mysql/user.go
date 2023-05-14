@@ -4,7 +4,6 @@ import (
 	"chatchat/app/global"
 	"chatchat/model"
 	"chatchat/utils"
-	"database/sql"
 	"fmt"
 	"log"
 	"time"
@@ -25,31 +24,6 @@ func AddUser(username, password, nickname string, ID int64) (bool, string) {
 	}
 	log.Println("insert success")
 	return true, ""
-}
-
-func SelectUser(username string) bool {
-	//boot.MysqlDBSetup()
-	u.Username = username
-	sqlStr := "select  username from user_bases where username=?"
-	// 非常重要：确保QueryRow之后调用Scan方法，否则持有的数据库链接不会被释放
-	err := global.MysqlDB.QueryRow(sqlStr, username).Scan(&u.Username)
-	if err != nil {
-		fmt.Printf("scan failed, err:%v\n", err)
-		return false
-	}
-	return true
-}
-
-func SelectPassword(username string) string {
-	sqlStr := "select id, username, password from user_bases where username=?"
-	// 非常重要：确保QueryRow之后调用Scan方法，否则持有的数据库链接不会被释放
-	u.Username = username
-	err := global.MysqlDB.QueryRow(sqlStr, username).Scan(&u.ID, &u.Username, &u.Password)
-	if err != nil {
-		fmt.Printf("scan failed, err:%v\n", err)
-		return ""
-	}
-	return u.Password
 }
 func SelectID(username string) int64 {
 	sqlStr := "select id, username, password from user_bases where username=?"
@@ -106,28 +80,7 @@ func ChangeAvatar(st model.User) (bool, string) {
 	log.Println("update success")
 	return true, ""
 }
-func FindNickname(nickname string) bool {
-	sqlStr := "select id,nickname from user_bases where nickname=?"
-	u.Nickname = nickname
-	u.ID = 0
-	// 非常重要：确保QueryRow之后调用Scan方法，否则持有的数据库链接不会被释放
-	err := global.MysqlDB.QueryRow(sqlStr, nickname).Scan(&u.ID, &u.Nickname)
-	if err == sql.ErrNoRows {
-		//无事发生
-	} else if err != nil {
-		fmt.Printf("scan failed, err:%v\n", err)
-		return false
-	}
-	//if err != nil || err != errors.New("sql: no rows in result set") {
-	//	fmt.Printf("scan failed, err:%v\n", err)
-	//	return false
-	//}
-	if u.ID == 0 {
-		return true
-	} else {
-		return false
-	}
-}
+
 func FindID() int {
 	sqlStr := "select id from user_bases where id >=?"
 	rows, err := global.MysqlDB.Query(sqlStr, 0)

@@ -18,11 +18,6 @@ func SendMail(c *gin.Context) {
 		utils.ResponseFail(c, "get username failed")
 		return
 	}
-	flag, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "password")
-	if flag != "" {
-		utils.ResponseFail(c, "user already exists")
-		return
-	}
 	flag1, msg := dao.AddUserCheck(username, "wzywzywzywzy", "紫雨")
 	if !flag1 {
 		utils.ResponseFail(c, msg)
@@ -44,7 +39,7 @@ func Mail(username string, uid int) {
 	m.SetHeader("To", username)
 	m.SetHeader("Subject", "Verify to login into the chatchat")
 	m.SetBody("text/plain", "Hello! 你的验证码是"+strconv.Itoa(uid)+"，不要告诉别人哦~")
-	m.Attach("./images/mail.png")
+	//m.Attach("./images/mail.png")
 
 	host := "smtp.qq.com"
 	port := 25

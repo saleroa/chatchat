@@ -20,6 +20,13 @@ type User struct {
 	CreateTime   time.Time `form:"create_time" json:"create_time" `
 	UpdateTime   time.Time `form:"update_time" json:"update_time" `
 }
+type OauthUser struct {
+	ExpiresIn      int64  `form:"expires_in" json:"expires_in" `
+	ClientID       string `form:"client_id" json:"client_id" `
+	Avatar         string `form:"avatar" json:"avatar" `
+	Nickname       string `form:"nickname" json:"nickname" `
+	Oauth2Username int64  `form:"oauth2Username" json:"oauth2Username" `
+}
 type MyClaims struct {
 	Username string `json:"username"`
 	ID       int64  `json:"id"`

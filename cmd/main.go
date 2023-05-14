@@ -2,11 +2,10 @@ package main
 
 import (
 	"chatchat/boot"
-	"chatchat/utils"
 )
 
 func main() {
-	boot.ViperSetup(utils.Path())
+	boot.ViperSetup("./config.yaml")
 	boot.Loggersetup()
 	boot.MysqlDBSetup()
 	boot.RedisSetup()
