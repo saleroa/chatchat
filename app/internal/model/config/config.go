@@ -4,4 +4,5 @@ type Config struct {
 	Logger   *Logger   `mapstructure:"logger" yaml:"logger"`
 	Database *Database `mapstructure:"database" yaml:"database"`
 	Server   *Server   `mapstructure:"server" yaml:"server"`
+	Session  *Session  `mapstructure:"session" yaml:"session"`
 }

@@ -37,7 +37,7 @@ var (
 			TokenURL: authServerURL + "/oauth/token",
 		},
 	}
-	globalToken *oauth2.Token // Non-concurrent security
+	//globalToken *oauth2.Token // Non-concurrent security
 )
 
 func genCodeChallengeS256(s string) string {
@@ -88,12 +88,16 @@ func Oauth2Register(c *gin.Context) {
 	})
 }
 func Oauth2Try(c *gin.Context) {
+	globalToken, err := middleware.Get(c.Request, "globalToken")
+	if err != nil {
+		panic(err)
+	}
 	if globalToken == nil {
 		http.Redirect(c.Writer, c.Request, "/oauth2login", http.StatusFound)
 		return
 	}
 
-	resp, err := http.Get(fmt.Sprintf("%s/verify?access_token=%s", authServerURL, globalToken.AccessToken))
+	resp, err := http.Get(fmt.Sprintf("%s/verify?access_token=%s", authServerURL, globalToken.(*oauth2.Token).AccessToken))
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
@@ -138,18 +142,18 @@ func Oauth2Try(c *gin.Context) {
 	})
 }
 
-func Oauth2Pwd(c *gin.Context) {
-	token, err := config.PasswordCredentialsToken(context.Background(), "2022214740", "666666666")
-	if err != nil {
-		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	globalToken = token
-	e := json.NewEncoder(c.Writer)
-	e.SetIndent("", "  ")
-	e.Encode(token)
-}
+//func Oauth2Pwd(c *gin.Context) {
+//	token, err := config.PasswordCredentialsToken(context.Background(), "2022214740", "666666666")
+//	if err != nil {
+//		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+//		return
+//	}
+//
+//	globalToken = token
+//	e := json.NewEncoder(c.Writer)
+//	e.SetIndent("", "  ")
+//	e.Encode(token)
+//}
 
 func Oauth2Client(c *gin.Context) {
 	cfg := clientcredentials.Config{
@@ -170,19 +174,20 @@ func Oauth2Client(c *gin.Context) {
 }
 
 func Oauth2Refresh(c *gin.Context) {
+	globalToken, err := middleware.Get(c.Request, "globalToken")
 	if globalToken == nil {
 		http.Redirect(c.Writer, c.Request, "/", http.StatusFound)
 		return
 	}
 
-	globalToken.Expiry = time.Now()
-	token, err := config.TokenSource(context.Background(), globalToken).Token()
+	globalToken.(*oauth2.Token).Expiry = time.Now()
+	token, err := config.TokenSource(context.Background(), globalToken.(*oauth2.Token)).Token()
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	globalToken = token
+	_ = middleware.Set(c.Writer, c.Request, "globalToken", token)
 	e := json.NewEncoder(c.Writer)
 	e.SetIndent("", "  ")
 	e.Encode(token)
@@ -205,7 +210,8 @@ func Oauth2(c *gin.Context) {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	globalToken = token
+
+	_ = middleware.Set(c.Writer, c.Request, "globalToken", token)
 
 	e := json.NewEncoder(c.Writer)
 	e.SetIndent("", "  ")

@@ -28,6 +28,12 @@ database:
     db: 1
     poolSize: 10000
 
+session:
+  name: session_id
+  secret_key: "asdfsdaf"
+  max_age: 1200
+
 server:
   mode: "debug"
   port: 8088
+

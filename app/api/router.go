@@ -18,7 +18,7 @@ func InitRouter() error {
 	r.GET("/oauth2", Oauth2)
 	r.GET("/oauth2/refresh", Oauth2Refresh)
 	r.GET("/oauth2/try", Oauth2Try)
-	r.GET("/oauth2/pwd", Oauth2Pwd)
+	//r.GET("/oauth2/pwd", Oauth2Pwd)
 	r.GET("/oauth2/client", Oauth2Client)
 
 	UserRouter := r.Group("/user")
@@ -27,7 +27,7 @@ func InitRouter() error {
 		UserRouter.POST("/changePassword", ChangePassword)
 		UserRouter.POST("/changeNickname", ChangeNickname)
 		UserRouter.POST("/changeIntroduction", ChangeIntroduction)
-		//UserRouter.POST("/changeAvatar", ChangeAvatar)
+		UserRouter.POST("/changeAvatar", ChangeAvatar)
 		UserRouter.GET("/getUser", GetUser)
 	}
 

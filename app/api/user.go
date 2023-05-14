@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -174,36 +175,34 @@ func ChangeNickname(c *gin.Context) {
 	utils.ResponseSuccess(c, "change nickname success")
 }
 
-//	func ChangeAvatar(c *gin.Context) {
-//		// 解析表单数据，设置最大文件大小
-//		username, _ := c.Get("username")
-//		err := c.Request.ParseMultipartForm(32 << 20)
-//		if err != nil {
-//			// 处理错误
-//			utils.ResponseFail(c, "avatar's size is beyond the max size")
-//			return
-//		}
-//
-//		// 获取上传的文件
-//		avatar, handler, err := c.Request.FormFile("image")
-//		if err != nil {
-//			// 处理错误
-//			utils.ResponseFail(c, "wrong format of the avatar")
-//			return
-//		}
-//		defer avatar.Close()
-//
-//		up := upyun.NewUpYun(&upyun.UpYunConfig{
-//			Bucket:   "image-chatchat",
-//			Operator: "ziyu",
-//			Password: "BmpDdXw4QvpWtwB96UuHanTuIGoD63Yu",
-//		})
-//		FR, err := up.FormUpload(&upyun.FormUploadConfig{
-//			LocalPath: "",
-//			SaveKey:   "/chatchatUsers/" + username.(string),
-//			NotifyUrl: "",
-//		})
-//	}
+func ChangeAvatar(c *gin.Context) {
+	// 解析表单数据，设置最大文件大小
+	username, _ := c.Get("username")
+	err := c.Request.ParseMultipartForm(32 << 20)
+	if err != nil {
+		// 处理错误
+		utils.ResponseFail(c, "avatar's size is beyond the max size")
+		return
+	}
+
+	// 获取上传的文件
+	avatar, _, err := c.Request.FormFile("image")
+	if err != nil {
+		// 处理错误
+		utils.ResponseFail(c, "wrong format of the avatar")
+		return
+	}
+	defer avatar.Close()
+	// 假设前端传来的图片数据存储在变量 imageData 中
+
+	// 将图片数据写入临时文件
+	tempFile, err := ioutil.ReadAll(avatar)
+
+	// 获取临时文件的路径
+	imagePath := string(tempFile)
+	utils.Upload(imagePath, username.(string))
+
+}
 func ChangeIntroduction(c *gin.Context) {
 	username, _ := c.Get("username")
 	//id ,_:=c.Get("id")

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"chatchat/app/api/middleware"
 	"chatchat/boot"
 )
 
@@ -9,5 +10,6 @@ func main() {
 	boot.Loggersetup()
 	boot.MysqlDBSetup()
 	boot.RedisSetup()
+	middleware.SessionSetup()
 	boot.ServerSetup()
 }
