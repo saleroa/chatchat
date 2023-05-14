@@ -27,11 +27,6 @@ func register(c *gin.Context) {
 	password := user.Password
 	nickname := user.Nickname
 	mailID := user.MailID
-	flag, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "password")
-	if flag != "" {
-		utils.ResponseFail(c, "user already exists")
-		return
-	}
 	EncryptPassword, err1 := utils.EncryptPassword(password) //加密密码
 	if err1 != nil {
 		utils.ResponseFail(c, "encrypt password failed")
@@ -47,7 +42,7 @@ func register(c *gin.Context) {
 	user.Nickname = nickname
 	user.Introduction = "这个人很懒，什么都没留下~"
 	user.Avatar = "http://test.violapioggia.cn/chatchatUsers/empty_avatar.png"
-	uid, err := redis.Get(c, fmt.Sprintf("mail:%s", username))
+	uid, err := redis.Get(c, fmt.Sprintf("Rmail:%s", username))
 	if err != nil {
 		utils.ResponseFail(c, "verification code has expired")
 		return

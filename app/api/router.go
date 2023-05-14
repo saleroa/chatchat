@@ -11,6 +11,7 @@ func InitRouter() error {
 	r.POST("/register", register)
 	r.POST("/login", login)
 	r.POST("/verificationID", SendMail)
+	r.POST("/RVerificationID", RSendMail)
 
 	r.GET("/oauth2login", Oauth2Login)
 	r.POST("/oauth2Register", Oauth2Register)
@@ -26,7 +27,7 @@ func InitRouter() error {
 		UserRouter.POST("/changePassword", ChangePassword)
 		UserRouter.POST("/changeNickname", ChangeNickname)
 		UserRouter.POST("/changeIntroduction", ChangeIntroduction)
-		UserRouter.POST("/changeAvatar", ChangeAvatar)
+		//UserRouter.POST("/changeAvatar", ChangeAvatar)
 		UserRouter.GET("/getUser", GetUser)
 	}
 

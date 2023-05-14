@@ -33,6 +33,34 @@ func SendMail(c *gin.Context) {
 	utils.ResponseSuccess(c, "send email to the user success")
 	return
 }
+
+func RSendMail(c *gin.Context) {
+	username, f := c.GetPostForm("username")
+	if !f {
+		utils.ResponseFail(c, "get username failed")
+		return
+	}
+	flag, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "password")
+	if flag != "" {
+		utils.ResponseFail(c, "user already exists")
+		return
+	}
+	flag1, msg := dao.AddUserCheck(username, "wzywzywzywzy", "紫雨")
+	if !flag1 {
+		utils.ResponseFail(c, msg)
+		return
+	}
+	uid := utils.GetVerificationID()
+	Mail(username, uid)
+	err := redis.Set(c, fmt.Sprintf("Rmail:%s", username), uid, 5*time.Minute)
+	if err != nil {
+		utils.ResponseFail(c, "write mailID into redis failed")
+		return
+	}
+	utils.ResponseSuccess(c, "send email to the user success")
+	return
+}
+
 func Mail(username string, uid int) {
 	m := gomail.NewMessage()
 	m.SetHeader("From", "violapioggia@qq.com")

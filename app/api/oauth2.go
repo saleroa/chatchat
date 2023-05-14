@@ -52,7 +52,7 @@ func Oauth2Register(c *gin.Context) {
 	}
 	var user model.OauthUser
 	c.ShouldBind(&user)
-	uid, _ := redis.Get(c, fmt.Sprintf("mail:%s", username))
+	uid, _ := redis.Get(c, fmt.Sprintf("Rmail:%s", username))
 	if uid != mailID {
 		utils.ResponseFail(c, "wrong mailID")
 		return
@@ -104,7 +104,7 @@ func Oauth2Try(c *gin.Context) {
 		utils.ResponseFail(c, err.Error())
 		return
 	}
-	var user *model.OauthUser
+	var user model.OauthUser
 	err = json.Unmarshal(bodyBytes, &user)
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
