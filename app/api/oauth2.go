@@ -176,7 +176,7 @@ func Oauth2Client(c *gin.Context) {
 func Oauth2Refresh(c *gin.Context) {
 	globalToken, err := middleware.Get(c.Request, "globalToken")
 	if globalToken == nil {
-		http.Redirect(c.Writer, c.Request, "/", http.StatusFound)
+		http.Redirect(c.Writer, c.Request, "/oauth2login", http.StatusFound)
 		return
 	}
 
@@ -211,8 +211,10 @@ func Oauth2(c *gin.Context) {
 		return
 	}
 
-	_ = middleware.Set(c.Writer, c.Request, "globalToken", token)
-
+	err = middleware.Set(c.Writer, c.Request, "globalToken", token)
+	if err != nil {
+		panic(err.Error())
+	}
 	e := json.NewEncoder(c.Writer)
 	e.SetIndent("", "  ")
 	e.Encode(token)

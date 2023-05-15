@@ -40,7 +40,7 @@ func RSendMail(c *gin.Context) {
 		utils.ResponseFail(c, "get username failed")
 		return
 	}
-	flag, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "password")
+	flag, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "id")
 	if flag != "" {
 		utils.ResponseFail(c, "user already exists")
 		return

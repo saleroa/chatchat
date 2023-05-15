@@ -4,13 +4,24 @@ import (
 	"chatchat/app/global"
 	"encoding/gob"
 	"github.com/gorilla/sessions"
+	"golang.org/x/oauth2"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 var store *sessions.CookieStore
 
+type Token struct {
+	AccessToken  string    `json:"access_token"`
+	TokenType    string    `json:"token_type,omitempty"`
+	RefreshToken string    `json:"refresh_token,omitempty"`
+	Expiry       time.Time `json:"expiry,omitempty"`
+	raw          interface{}
+}
+
 func SessionSetup() {
+	gob.Register(&oauth2.Token{})
 	gob.Register(url.Values{})
 	session := global.Config.Session
 
