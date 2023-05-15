@@ -72,6 +72,7 @@ func Oauth2Register(c *gin.Context) {
 	redis.HSet(c, fmt.Sprintf("user:%s", username), "nickname", user.Nickname)
 	redis.HSet(c, fmt.Sprintf("user:%s", username), "avatar", user.Avatar)
 	redis.HSet(c, fmt.Sprintf("user:%s", username), "id", ID)
+	redis.HSet(c, fmt.Sprintf("user:%s", username), "introduction", "这个人很懒，什么都没留下~")
 	claim := model.MyClaims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
@@ -142,19 +143,31 @@ func Oauth2Try(c *gin.Context) {
 	})
 }
 
-//func Oauth2Pwd(c *gin.Context) {
-//	token, err := config.PasswordCredentialsToken(context.Background(), "2022214740", "666666666")
-//	if err != nil {
-//		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-//		return
-//	}
+//	func Oauth2Pwd(c *gin.Context) {
+//		token, err := config.PasswordCredentialsToken(context.Background(), "2022214740", "666666666")
+//		if err != nil {
+//			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+//			return
+//		}
 //
-//	globalToken = token
-//	e := json.NewEncoder(c.Writer)
-//	e.SetIndent("", "  ")
-//	e.Encode(token)
-//}
-
+//		globalToken = token
+//		e := json.NewEncoder(c.Writer)
+//		e.SetIndent("", "  ")
+//		e.Encode(token)
+//	}
+func Oauth2Logout(c *gin.Context) {
+	url, flag := c.GetQuery("redirect_uri")
+	if flag == false {
+		utils.ResponseFail(c, "lack of redirect_uri")
+		return
+	}
+	_ = middleware.Delete(c.Writer, c.Request, "LoggedInUserID")
+	if err := middleware.Delete(c.Writer, c.Request, "globalToken"); err != nil {
+		utils.ResponseFail(c, "delete session failed")
+		return
+	}
+	c.Redirect(302, url)
+}
 func Oauth2Client(c *gin.Context) {
 	cfg := clientcredentials.Config{
 		ClientID:     config.ClientID,

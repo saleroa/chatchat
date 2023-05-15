@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -176,8 +175,19 @@ func ChangeNickname(c *gin.Context) {
 }
 
 func ChangeAvatar(c *gin.Context) {
+	var user model.User
 	// 解析表单数据，设置最大文件大小
 	username, _ := c.Get("username")
+	var i int
+	for k, v := range username.(string) {
+		if v == '@' {
+			i = k
+			break
+		}
+	}
+	user.Username = username.(string)
+	num := username.(string)[:i]
+	user.Avatar = "http://test.violapioggia.cn/chatchatUsers/" + num + "%40" + "qq.com"
 	err := c.Request.ParseMultipartForm(32 << 20)
 	if err != nil {
 		// 处理错误
@@ -189,19 +199,23 @@ func ChangeAvatar(c *gin.Context) {
 	avatar, _, err := c.Request.FormFile("image")
 	if err != nil {
 		// 处理错误
-		utils.ResponseFail(c, "wrong format of the avatar")
+		utils.ResponseFail(c, err.Error())
 		return
 	}
 	defer avatar.Close()
-	// 假设前端传来的图片数据存储在变量 imageData 中
-
-	// 将图片数据写入临时文件
-	tempFile, err := ioutil.ReadAll(avatar)
-
-	// 获取临时文件的路径
-	imagePath := string(tempFile)
-	utils.Upload(imagePath, username.(string))
-
+	err = utils.Delete(username.(string))
+	err = utils.Upload(avatar, username.(string))
+	if err != nil {
+		utils.ResponseFail(c, fmt.Sprintf("change avatar failed,err:%s", err.Error()))
+		return
+	}
+	b, _ := mysql.ChangeAvatar(user)
+	if !b {
+		utils.ResponseFail(c, "update avatar failed")
+	}
+	redis.HSet(c, fmt.Sprintf("user:%s", username), "avatar", user.Avatar)
+	utils.ResponseSuccess(c, "change avatar success")
+	return
 }
 func ChangeIntroduction(c *gin.Context) {
 	username, _ := c.Get("username")

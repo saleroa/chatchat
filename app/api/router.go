@@ -20,6 +20,7 @@ func InitRouter() error {
 	r.GET("/oauth2/try", Oauth2Try)
 	//r.GET("/oauth2/pwd", Oauth2Pwd)
 	r.GET("/oauth2/client", Oauth2Client)
+	r.GET("/oauth2/logout", Oauth2Logout)
 
 	UserRouter := r.Group("/user")
 	{
