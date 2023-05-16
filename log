@@ -372,3 +372,5 @@
 [2023-05-10 21:14:00.191]	[34mINFO[0m	C:/Users/ViolaPioggia/GolandProjects/chatchat/boot/database.go:38	initialize database success
 [2023-05-10 21:14:00.193]	[34mINFO[0m	C:/Users/ViolaPioggia/GolandProjects/chatchat/boot/database.go:59	initialize redis success
 [2023-05-10 21:14:00.194]	[34mINFO[0m	C:/Users/ViolaPioggia/GolandProjects/chatchat/boot/server.go:19	initialize server success	{"port": ":8088"}
+[2023-05-16 10:25:48.430]	[34mINFO[0m	D:/mycode/go/chatchat/boot/logger.go:53	initialize logger success
+[2023-05-16 10:25:50.785]	[31mFATAL[0m	D:/mycode/go/chatchat/boot/database.go:34	connected failed	{"error": "dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it."}

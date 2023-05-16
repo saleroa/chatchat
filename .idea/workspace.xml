@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="突然发现有几个功能还没做">
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/chatchat.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/api/chat.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/api/group.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dao/insertandcachedata.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dao/mysql/chat.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dao/redis/chat.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dao/redis/group.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model/groups.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model/message.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model/onlineuser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/global/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dao/mysql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/mysql/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/log" beforeDir="false" afterPath="$PROJECT_DIR$/log" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../my  apps  apps/goland/go1.19.5" />
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2Pp4nRlQrSCyE3ro8oqpwkenVZf" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/29852&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\mycode\go\chat cowork\utils" />
+      <recent name="D:\mycode\go\chat cowork\dao\redis" />
+      <recent name="D:\mycode\go\chat cowork\dao\mysql" />
+      <recent name="D:\mycode\go\chat cowork\model" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\mycode\go\chatchat\dao" />
+      <recent name="D:\mycode\go\chat cowork\dao\redis" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="chatchat" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="chatchat" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build chatchat/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="chatchat" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="chatchat/cmd" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="chatchat" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <package value="chatchat" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go 构建.go build chatchat/cmd" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="突然发现有几个功能还没做" />
+    <option name="LAST_COMMIT_MESSAGE" value="突然发现有几个功能还没做" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>
