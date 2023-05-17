@@ -9,7 +9,7 @@ func InitRouter() error {
 	r := gin.Default()
 	r.Use(middleware.CORS())
 	r.POST("/register", register)
-	r.POST("/login", login)
+	r.POST("/login", login, GetOfflineMessage) // 钩子函数
 	r.POST("/verificationID", SendMail)
 	r.POST("/RVerificationID", RSendMail)
 
@@ -30,6 +30,33 @@ func InitRouter() error {
 		UserRouter.POST("/changeIntroduction", ChangeIntroduction)
 		UserRouter.POST("/changeAvatar", ChangeAvatar)
 		UserRouter.GET("/getUser", GetUser)
+	}
+
+	GroupRouter := r.Group("/group")
+	{
+		GroupRouter.Use(middleware.JWTAuthMiddleware())
+		GroupRouter.POST("/createGroup", CreateGroup)
+		GroupRouter.POST("/joinInGroup", JoinGroup)
+		GroupRouter.POST("/exitGroup", ExitGroup)
+		GroupRouter.POST("/kickOut", KickOut)
+		GroupRouter.DELETE("/deleteGroup", DeleteGroup)
+		//查找群组没做
+	}
+
+	//FriendRouter := r.Group("/group")
+	//{
+	//	FriendRouter.Use(middleware.JWTAuthMiddleware())
+	//
+	//	//添加好友，删除好友，获取所有好友
+	//	FriendRouter.POST("/addFriend", AddFriend)
+	//	FriendRouter.DELETE("/deleteFriend", DeleteFriend)
+	//	//查找好友没做
+	//}
+
+	ChatRouter := r.Group("/chat")
+	{
+		//ChatRouter.GET("/getall", GetAllYour)
+		ChatRouter.GET("/conn", GetConn)
 	}
 
 	err := r.Run(":8088")

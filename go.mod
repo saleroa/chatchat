@@ -7,7 +7,9 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.7.1
+	github.com/google/uuid v1.1.2
 	github.com/gorilla/sessions v1.2.1
+	github.com/gorilla/websocket v1.5.0
 	github.com/spf13/viper v1.15.0
 	github.com/upyun/go-sdk/v3 v3.0.4
 	go.uber.org/zap v1.21.0

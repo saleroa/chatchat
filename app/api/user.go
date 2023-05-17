@@ -103,6 +103,8 @@ func login(c *gin.Context) {
 		"message": "login success",
 		"token":   tokenString,
 	})
+	c.Set("id", user.ID)
+	c.Next()
 	return
 }
 
