@@ -8,10 +8,8 @@ import (
 	"chatchat/utils"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
-	"strconv"
 )
 
 func GetConn(c *gin.Context) {
@@ -117,13 +115,15 @@ func GWrite() {
 			}
 			//群发逻辑
 
-			result, err := cli.HGetAll(context.Background(), fmt.Sprintf("users:%s", string(message.TargetId))).Result()
+			rows, err := db.Query("select user_id from `group_members` where group_id = ?", message.TargetId)
 			if err != nil {
 				log.Println(err)
 				return
 			}
-			for _, uidstring := range result {
-				uid, _ := strconv.Atoi(uidstring)
+			for rows.Next() {
+				var uid int
+				rows.Scan(&uid)
+
 				//群聊用户在线
 				if global.OnlineMap[uid] != nil {
 
@@ -140,6 +140,7 @@ func GWrite() {
 				}
 
 			}
+
 		}
 	}
 }
@@ -151,10 +152,12 @@ func GetOfflineMessage(c *gin.Context) {
 	len, err := cli.LLen(context.Background(), string(id)).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
+		return
 	}
 	result, err := cli.LRange(context.Background(), "", 0, len-1).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
+		return
 	}
 	defer cli.Del(context.Background(), string(id))
 
@@ -170,10 +173,48 @@ func GetOfflineMessage(c *gin.Context) {
 	}
 }
 
-//func GetAllYours(c *gin.Context) {
-//	uid := c.GetInt("uid")
-//
-//	//返回好友的id
-//	//返回群组的id
-//
-//}
+func GetAll(c *gin.Context) {
+	var (
+		friends  []int
+		friendid int
+		groupid  int
+		groups   []int
+	)
+
+	uid := c.GetInt("uid")
+
+	db := global.MysqlDB
+
+	rows, err := db.Query("select fid from `friend` where uid = ?", uid)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&friendid)
+		if err != nil {
+			utils.ResponseFail(c, err.Error())
+			return
+		}
+		friends = append(friends, friendid)
+	}
+
+	rows, err = db.Query("select fid from `groups` where uid = ?", uid)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&groupid)
+		if err != nil {
+			utils.ResponseFail(c, err.Error())
+			return
+		}
+		friends = append(groups, groupid)
+	}
+
+	c.JSON(200, groups)
+	c.JSON(200, friends)
+}
