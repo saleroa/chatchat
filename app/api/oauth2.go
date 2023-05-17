@@ -89,16 +89,21 @@ func Oauth2Register(c *gin.Context) {
 	})
 }
 func Oauth2Try(c *gin.Context) {
-	globalToken, err := middleware.Get(c.Request, "globalToken")
+	var globalToken *oauth2.Token
+	t, err := middleware.Get(c.Request, "globalToken")
 	if err != nil {
 		panic(err)
 	}
-	if globalToken == nil {
+	if t == nil {
 		http.Redirect(c.Writer, c.Request, "/oauth2login", http.StatusFound)
 		return
 	}
+	err = json.Unmarshal(t.([]byte), &globalToken)
+	if err != nil {
+		panic("unmarshal failed,err:" + err.Error())
+	}
 
-	resp, err := http.Get(fmt.Sprintf("%s/verify?access_token=%s", authServerURL, globalToken.(*oauth2.Token).AccessToken))
+	resp, err := http.Get(fmt.Sprintf("%s/verify?access_token=%s", authServerURL, globalToken.AccessToken))
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
@@ -187,20 +192,27 @@ func Oauth2Client(c *gin.Context) {
 }
 
 func Oauth2Refresh(c *gin.Context) {
-	globalToken, err := middleware.Get(c.Request, "globalToken")
-	if globalToken == nil {
+	var globalToken *oauth2.Token
+	t, err := middleware.Get(c.Request, "globalToken")
+	if t == nil {
 		http.Redirect(c.Writer, c.Request, "/oauth2login", http.StatusFound)
 		return
 	}
-
-	globalToken.(*oauth2.Token).Expiry = time.Now()
-	token, err := config.TokenSource(context.Background(), globalToken.(*oauth2.Token)).Token()
+	err = json.Unmarshal(t.([]byte), &globalToken)
+	if err != nil {
+		panic("unmarshal failed,err:" + err.Error())
+	}
+	globalToken.Expiry = time.Now()
+	token, err := config.TokenSource(context.Background(), globalToken).Token()
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	_ = middleware.Set(c.Writer, c.Request, "globalToken", token)
+	t, err = json.Marshal(token)
+	if err != nil {
+		panic("marshal failed,err:" + err.Error())
+	}
+	_ = middleware.Set(c.Writer, c.Request, "globalToken", t)
 	e := json.NewEncoder(c.Writer)
 	e.SetIndent("", "  ")
 	e.Encode(token)
@@ -224,7 +236,11 @@ func Oauth2(c *gin.Context) {
 		return
 	}
 
-	err = middleware.Set(c.Writer, c.Request, "globalToken", token)
+	t, err := json.Marshal(token)
+	if err != nil {
+		panic("marshal failed,err:" + err.Error())
+	}
+	_ = middleware.Set(c.Writer, c.Request, "globalToken", t)
 	if err != nil {
 		panic(err.Error())
 	}
