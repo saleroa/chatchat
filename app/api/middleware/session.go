@@ -32,6 +32,8 @@ func SessionSetup() {
 		// 单位秒
 		MaxAge:   session.MaxAge,
 		HttpOnly: true,
+		//SameSite: http.SameSiteNoneMode,
+		//Domain:   "43.138.114.250",
 	}
 }
 

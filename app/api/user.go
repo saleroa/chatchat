@@ -42,7 +42,7 @@ func register(c *gin.Context) {
 	user.Nickname = nickname
 	user.Introduction = "这个人很懒，什么都没留下~"
 	user.Avatar = "http://test.violapioggia.cn/chatchatUsers/empty_avatar.png"
-	uid, err := redis.Get(c, fmt.Sprintf("Rmail:%s", username))
+	uid, err := redis.Get(c.Request.Context(), fmt.Sprintf("Rmail:%s", username))
 	if err != nil {
 		utils.ResponseFail(c, "verification code has expired")
 		return
@@ -51,14 +51,14 @@ func register(c *gin.Context) {
 		utils.ResponseFail(c, "wrong mailID")
 	}
 
-	user.ID = global.Rdb.ZCard(c, "userID").Val() + 1
-	flag1, msg := mysql.AddUser(username, password, nickname, user.ID) //写入数据库
+	user.ID = global.Rdb.ZCard(c.Request.Context(), "userID").Val() + 1
+	flag1, msg := mysql.AddUser(c.Request.Context(), username, password, nickname, user.ID) //写入数据库
 	if flag1 {
-		err := redis.ZSetUserID(c, username)
+		err := redis.ZSetUserID(c.Request.Context(), username)
 		if err != nil {
 			utils.ResponseFail(c, err.Error())
 		}
-		err = redis.HSet(c, fmt.Sprintf("user:%s", username), "id", user.ID, "password", user.Password, "nickname", user.Nickname, "introduction", user.Introduction, "avatar", user.Avatar)
+		err = redis.HSet(c.Request.Context(), fmt.Sprintf("user:%s", username), "id", user.ID, "password", user.Password, "nickname", user.Nickname, "introduction", user.Introduction, "avatar", user.Avatar)
 		if err != nil {
 			utils.ResponseFail(c, err.Error())
 		}
@@ -70,6 +70,18 @@ func register(c *gin.Context) {
 }
 
 func login(c *gin.Context) {
+	//span := opentracing.StartSpan("login")
+	//
+	//if span == nil {
+	//	fmt.Println("nil span")
+	//	panic("nil span")
+	//}
+	//span.SetTag("custom_tag", "custom_value")
+	//span.LogFields(
+	//	log.String("event", "custom_event"),
+	//	log.String("message", "custom_message"),
+	//)
+	//defer span.Finish()
 	var user model.User
 	if err := c.ShouldBind(&user); err != nil {
 		fmt.Println(err)
@@ -115,7 +127,7 @@ func ChangePassword(c *gin.Context) {
 	c.ShouldBind(&user)
 	newPassword := user.NewPassword
 	mailID := user.MailID
-	uid, _ := redis.Get(c, fmt.Sprintf("mail:%s", username))
+	uid, _ := redis.Get(c.Request.Context(), fmt.Sprintf("mail:%s", username))
 	if mailID != uid {
 		utils.ResponseFail(c, "wrong mailID")
 		return
@@ -134,14 +146,14 @@ func ChangePassword(c *gin.Context) {
 		Username: fmt.Sprintf("%s", username),
 		Password: newPassword,
 	}
-	flag2, msg := mysql.ChangePassword(u)
+	flag2, msg := mysql.ChangePassword(c.Request.Context(), u)
 	if flag2 {
 		utils.ResponseSuccess(c, "password change success")
 	} else {
 		utils.ResponseFail(c, fmt.Sprintf("password change failed,%s", msg))
 		return
 	} //更新数据库数据
-	err := redis.HSet(c, fmt.Sprintf("user:%s", username), "password", EncryptPassword) //重新写入到redis
+	err := redis.HSet(c.Request.Context(), fmt.Sprintf("user:%s", username), "password", EncryptPassword) //重新写入到redis
 	if err != nil {
 		utils.ResponseFail(c, "write into redis failed")
 	}
@@ -161,7 +173,7 @@ func ChangeNickname(c *gin.Context) {
 		Username: fmt.Sprintf("%s", username),
 		Nickname: nickname,
 	}
-	flag2, msg := mysql.ChangeNickname(u)
+	flag2, msg := mysql.ChangeNickname(c.Request.Context(), u)
 	if flag2 {
 	} else {
 		utils.ResponseFail(c, fmt.Sprintf("nickname change failed,%s", msg))
@@ -211,7 +223,7 @@ func ChangeAvatar(c *gin.Context) {
 		utils.ResponseFail(c, fmt.Sprintf("change avatar failed,err:%s", err.Error()))
 		return
 	}
-	b, _ := mysql.ChangeAvatar(user)
+	b, _ := mysql.ChangeAvatar(c.Request.Context(), user)
 	if !b {
 		utils.ResponseFail(c, "update avatar failed")
 	}
@@ -230,7 +242,7 @@ func ChangeIntroduction(c *gin.Context) {
 		Username:     fmt.Sprintf("%s", username),
 		Introduction: introduction,
 	}
-	flag2, msg := mysql.ChangeIntroduction(u)
+	flag2, msg := mysql.ChangeIntroduction(c.Request.Context(), u)
 	if flag2 {
 	} else {
 		utils.ResponseFail(c, fmt.Sprintf("introduction change failed,%s", msg))

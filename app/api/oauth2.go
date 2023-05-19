@@ -59,7 +59,7 @@ func Oauth2Register(c *gin.Context) {
 	}
 	ID := global.Rdb.ZCard(c, "userID").Val() + 1
 	flag, msg := mysql.AddOauth2User(username, strconv.FormatInt(user.Oauth2Username, 10))
-	flag, msg = mysql.AddUser(username, "", user.Nickname, ID) //写入数据库
+	flag, msg = mysql.AddUser(c.Request.Context(), username, "", user.Nickname, ID) //写入数据库
 	if !flag {
 		utils.ResponseFail(c, fmt.Sprintf("write into mysql failed,%s", msg))
 		return
@@ -148,18 +148,61 @@ func Oauth2Try(c *gin.Context) {
 	})
 }
 
-//	func Oauth2Pwd(c *gin.Context) {
-//		token, err := config.PasswordCredentialsToken(context.Background(), "2022214740", "666666666")
-//		if err != nil {
-//			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-//			return
-//		}
-//
-//		globalToken = token
-//		e := json.NewEncoder(c.Writer)
-//		e.SetIndent("", "  ")
-//		e.Encode(token)
-//	}
+func Oauth2Pwd(c *gin.Context) {
+	username, f1 := c.GetPostForm("username")
+	password, f2 := c.GetPostForm("password")
+	if f1 == false || f2 == false {
+		utils.ResponseFail(c, "请输入账号和密码")
+	}
+	token, err := config.PasswordCredentialsToken(context.Background(), username, password)
+	if err != nil {
+		utils.ResponseFail(c, "wrong password")
+		return
+	}
+	resp, err := http.Get(fmt.Sprintf("%s/verify?access_token=%s", authServerURL, token.AccessToken))
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	defer resp.Body.Close()
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	var user model.OauthUser
+	err = json.Unmarshal(bodyBytes, &user)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	//println(bodyBytes)
+	//println(user)
+	//io.Copy(c.Writer, resp.Body)
+	username1, _ := redis.HGet(c, "Oauth2User", strconv.FormatInt(user.Oauth2Username, 10))
+	if username1 != "" {
+		claim := model.MyClaims{
+			Username: username1.(string),
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Add(time.Hour * 2).Unix(),
+				Issuer:    "Wzy",
+			},
+		}
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+		tokenString, _ := token.SignedString(middleware.Secret)
+		c.JSON(http.StatusOK, gin.H{
+			"status":  200,
+			"message": "login success",
+			"token":   tokenString,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  200,
+		"message": "base_user doesn't exist, please register a new one",
+		"data":    user,
+	})
+}
 func Oauth2Logout(c *gin.Context) {
 	url, flag := c.GetQuery("redirect_uri")
 	if flag == false {
@@ -254,4 +297,11 @@ func Oauth2Login(c *gin.Context) {
 		oauth2.SetAuthURLParam("code_challenge", genCodeChallengeS256("s256example")),
 		oauth2.SetAuthURLParam("code_challenge_method", "S256"))
 	http.Redirect(c.Writer, c.Request, u, http.StatusFound)
+}
+
+func GetEmptyCookie(c *gin.Context) {
+	err := middleware.Set(c.Writer, c.Request, "globalToken", "")
+	if err != nil {
+		panic(err.Error())
+	}
 }

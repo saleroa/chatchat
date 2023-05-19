@@ -10,7 +10,6 @@ import (
 
 func ServerSetup() {
 	config := global.Config.Server
-
 	gin.SetMode(config.Mode)
 	server := &http.Server{
 		Addr:           config.Addr(),
