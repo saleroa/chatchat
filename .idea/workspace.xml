@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat:add jaeger tracer">
+    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat:add sentinel">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/jaeger.go" beforeDir="false" afterPath="$PROJECT_DIR$/boot/jaeger.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/main" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,7 +129,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="突然发现有几个功能还没做" />
     <MESSAGE value="feat:add jaeger tracer" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat:add jaeger tracer" />
+    <MESSAGE value="feat:add sentinel" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat:add sentinel" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
