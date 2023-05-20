@@ -3,23 +3,33 @@ package api
 import (
 	"chatchat/app/api/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing-contrib/go-gin/ginhttp"
+	"github.com/opentracing/opentracing-go"
 )
 
 func InitRouter() error {
+	tracer := opentracing.GlobalTracer()
+	span := tracer.StartSpan("span_root")
+	defer span.Finish()
+
 	r := gin.Default()
 	r.Use(middleware.CORS())
+	r.Use(ginhttp.Middleware(opentracing.GlobalTracer()))
+
 	r.POST("/register", register)
 	r.POST("/login", login, GetOfflineMessage) // 钩子函数，上线就读取离线消息
 	r.POST("/verificationID", SendMail)
 	r.POST("/RVerificationID", RSendMail)
 
+	r.GET("/getCookie", GetEmptyCookie)
 	r.GET("/oauth2login", Oauth2Login)
 	r.POST("/oauth2Register", Oauth2Register)
 	r.GET("/oauth2", Oauth2)
 	r.GET("/oauth2/refresh", Oauth2Refresh)
 	r.GET("/oauth2/try", Oauth2Try)
-	//r.GET("/oauth2/pwd", Oauth2Pwd)
+	r.POST("/oauth2/pwd", Oauth2Pwd)
 	r.GET("/oauth2/client", Oauth2Client)
+	r.GET("/oauth2/logout", Oauth2Logout)
 
 	UserRouter := r.Group("/user")
 	{

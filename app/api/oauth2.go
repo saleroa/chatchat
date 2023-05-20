@@ -59,7 +59,7 @@ func Oauth2Register(c *gin.Context) {
 	}
 	ID := global.Rdb.ZCard(c, "userID").Val() + 1
 	flag, msg := mysql.AddOauth2User(username, strconv.FormatInt(user.Oauth2Username, 10))
-	flag, msg = mysql.AddUser(username, "", user.Nickname, ID) //写入数据库
+	flag, msg = mysql.AddUser(c.Request.Context(), username, "", user.Nickname, ID) //写入数据库
 	if !flag {
 		utils.ResponseFail(c, fmt.Sprintf("write into mysql failed,%s", msg))
 		return
@@ -72,6 +72,7 @@ func Oauth2Register(c *gin.Context) {
 	redis.HSet(c, fmt.Sprintf("user:%s", username), "nickname", user.Nickname)
 	redis.HSet(c, fmt.Sprintf("user:%s", username), "avatar", user.Avatar)
 	redis.HSet(c, fmt.Sprintf("user:%s", username), "id", ID)
+	redis.HSet(c, fmt.Sprintf("user:%s", username), "introduction", "这个人很懒，什么都没留下~")
 	claim := model.MyClaims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
@@ -88,16 +89,21 @@ func Oauth2Register(c *gin.Context) {
 	})
 }
 func Oauth2Try(c *gin.Context) {
-	globalToken, err := middleware.Get(c.Request, "globalToken")
+	var globalToken *oauth2.Token
+	t, err := middleware.Get(c.Request, "globalToken")
 	if err != nil {
 		panic(err)
 	}
-	if globalToken == nil {
+	if t == nil {
 		http.Redirect(c.Writer, c.Request, "/oauth2login", http.StatusFound)
 		return
 	}
+	err = json.Unmarshal(t.([]byte), &globalToken)
+	if err != nil {
+		panic("unmarshal failed,err:" + err.Error())
+	}
 
-	resp, err := http.Get(fmt.Sprintf("%s/verify?access_token=%s", authServerURL, globalToken.(*oauth2.Token).AccessToken))
+	resp, err := http.Get(fmt.Sprintf("%s/verify?access_token=%s", authServerURL, globalToken.AccessToken))
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
@@ -142,19 +148,74 @@ func Oauth2Try(c *gin.Context) {
 	})
 }
 
-//func Oauth2Pwd(c *gin.Context) {
-//	token, err := config.PasswordCredentialsToken(context.Background(), "2022214740", "666666666")
-//	if err != nil {
-//		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-//		return
-//	}
-//
-//	globalToken = token
-//	e := json.NewEncoder(c.Writer)
-//	e.SetIndent("", "  ")
-//	e.Encode(token)
-//}
-
+func Oauth2Pwd(c *gin.Context) {
+	username, f1 := c.GetPostForm("username")
+	password, f2 := c.GetPostForm("password")
+	if f1 == false || f2 == false {
+		utils.ResponseFail(c, "请输入账号和密码")
+	}
+	token, err := config.PasswordCredentialsToken(context.Background(), username, password)
+	if err != nil {
+		utils.ResponseFail(c, "wrong password")
+		return
+	}
+	resp, err := http.Get(fmt.Sprintf("%s/verify?access_token=%s", authServerURL, token.AccessToken))
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	defer resp.Body.Close()
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	var user model.OauthUser
+	err = json.Unmarshal(bodyBytes, &user)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	//println(bodyBytes)
+	//println(user)
+	//io.Copy(c.Writer, resp.Body)
+	username1, _ := redis.HGet(c, "Oauth2User", strconv.FormatInt(user.Oauth2Username, 10))
+	if username1 != "" {
+		claim := model.MyClaims{
+			Username: username1.(string),
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Add(time.Hour * 2).Unix(),
+				Issuer:    "Wzy",
+			},
+		}
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+		tokenString, _ := token.SignedString(middleware.Secret)
+		c.JSON(http.StatusOK, gin.H{
+			"status":  200,
+			"message": "login success",
+			"token":   tokenString,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  200,
+		"message": "base_user doesn't exist, please register a new one",
+		"data":    user,
+	})
+}
+func Oauth2Logout(c *gin.Context) {
+	url, flag := c.GetQuery("redirect_uri")
+	if flag == false {
+		utils.ResponseFail(c, "lack of redirect_uri")
+		return
+	}
+	_ = middleware.Delete(c.Writer, c.Request, "LoggedInUserID")
+	if err := middleware.Delete(c.Writer, c.Request, "globalToken"); err != nil {
+		utils.ResponseFail(c, "delete session failed")
+		return
+	}
+	c.Redirect(302, url)
+}
 func Oauth2Client(c *gin.Context) {
 	cfg := clientcredentials.Config{
 		ClientID:     config.ClientID,
@@ -174,20 +235,27 @@ func Oauth2Client(c *gin.Context) {
 }
 
 func Oauth2Refresh(c *gin.Context) {
-	globalToken, err := middleware.Get(c.Request, "globalToken")
-	if globalToken == nil {
-		http.Redirect(c.Writer, c.Request, "/", http.StatusFound)
+	var globalToken *oauth2.Token
+	t, err := middleware.Get(c.Request, "globalToken")
+	if t == nil {
+		http.Redirect(c.Writer, c.Request, "/oauth2login", http.StatusFound)
 		return
 	}
-
-	globalToken.(*oauth2.Token).Expiry = time.Now()
-	token, err := config.TokenSource(context.Background(), globalToken.(*oauth2.Token)).Token()
+	err = json.Unmarshal(t.([]byte), &globalToken)
+	if err != nil {
+		panic("unmarshal failed,err:" + err.Error())
+	}
+	globalToken.Expiry = time.Now()
+	token, err := config.TokenSource(context.Background(), globalToken).Token()
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	_ = middleware.Set(c.Writer, c.Request, "globalToken", token)
+	t, err = json.Marshal(token)
+	if err != nil {
+		panic("marshal failed,err:" + err.Error())
+	}
+	_ = middleware.Set(c.Writer, c.Request, "globalToken", t)
 	e := json.NewEncoder(c.Writer)
 	e.SetIndent("", "  ")
 	e.Encode(token)
@@ -211,8 +279,14 @@ func Oauth2(c *gin.Context) {
 		return
 	}
 
-	_ = middleware.Set(c.Writer, c.Request, "globalToken", token)
-
+	t, err := json.Marshal(token)
+	if err != nil {
+		panic("marshal failed,err:" + err.Error())
+	}
+	_ = middleware.Set(c.Writer, c.Request, "globalToken", t)
+	if err != nil {
+		panic(err.Error())
+	}
 	e := json.NewEncoder(c.Writer)
 	e.SetIndent("", "  ")
 	e.Encode(token)
@@ -223,4 +297,11 @@ func Oauth2Login(c *gin.Context) {
 		oauth2.SetAuthURLParam("code_challenge", genCodeChallengeS256("s256example")),
 		oauth2.SetAuthURLParam("code_challenge_method", "S256"))
 	http.Redirect(c.Writer, c.Request, u, http.StatusFound)
+}
+
+func GetEmptyCookie(c *gin.Context) {
+	err := middleware.Set(c.Writer, c.Request, "globalToken", "")
+	if err != nil {
+		panic(err.Error())
+	}
 }

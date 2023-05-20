@@ -11,5 +11,7 @@ func main() {
 	boot.MysqlDBSetup()
 	boot.RedisSetup()
 	middleware.SessionSetup()
+	boot.JaegerSetup()
+	boot.SentinelSetup()
 	boot.ServerSetup()
 }
