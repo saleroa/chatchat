@@ -13,7 +13,9 @@ func InitRouter() error {
 	defer span.Finish()
 
 	r := gin.Default()
-	r.Use(middleware.CORS(), ginhttp.Middleware(opentracing.GlobalTracer()))
+	r.Use(middleware.CORS())
+	r.Use(ginhttp.Middleware(opentracing.GlobalTracer()))
+
 	r.POST("/register", register)
 	r.POST("/login", login, GetOfflineMessage) // 钩子函数
 	r.POST("/verificationID", SendMail)

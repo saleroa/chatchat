@@ -9,6 +9,8 @@ import (
 	"chatchat/model"
 	"chatchat/utils"
 	"fmt"
+	sentinel "github.com/alibaba/sentinel-golang/api"
+	"github.com/alibaba/sentinel-golang/core/base"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -16,108 +18,116 @@ import (
 )
 
 func register(c *gin.Context) {
-	var user *model.User
-	if err := c.ShouldBind(&user); err != nil {
-		fmt.Println(err)
-		utils.ResponseFail(c, "verification failed")
-		return
-	}
-	// 传入用户名和密码
-	username := user.Username
-	password := user.Password
-	nickname := user.Nickname
-	mailID := user.MailID
-	EncryptPassword, err1 := utils.EncryptPassword(password) //加密密码
-	if err1 != nil {
-		utils.ResponseFail(c, "encrypt password failed")
-		return
-	}
-	flag2, msg := dao.AddUserCheck(username, password, nickname)
-	if !flag2 {
-		utils.ResponseFail(c, msg)
-		return
-	}
-	user.Password = EncryptPassword
-	//_ = redis.Set(c, fmt.Sprintf("%s:vip", username), "0", 0)
-	user.Nickname = nickname
-	user.Introduction = "这个人很懒，什么都没留下~"
-	user.Avatar = "http://test.violapioggia.cn/chatchatUsers/empty_avatar.png"
-	uid, err := redis.Get(c.Request.Context(), fmt.Sprintf("Rmail:%s", username))
-	if err != nil {
-		utils.ResponseFail(c, "verification code has expired")
-		return
-	}
-	if uid == "" || uid != mailID {
-		utils.ResponseFail(c, "wrong mailID")
-	}
-
-	user.ID = global.Rdb.ZCard(c.Request.Context(), "userID").Val() + 1
-	flag1, msg := mysql.AddUser(c.Request.Context(), username, password, nickname, user.ID) //写入数据库
-	if flag1 {
-		err := redis.ZSetUserID(c.Request.Context(), username)
-		if err != nil {
-			utils.ResponseFail(c, err.Error())
-		}
-		err = redis.HSet(c.Request.Context(), fmt.Sprintf("user:%s", username), "id", user.ID, "password", user.Password, "nickname", user.Nickname, "introduction", user.Introduction, "avatar", user.Avatar)
-		if err != nil {
-			utils.ResponseFail(c, err.Error())
-		}
-		utils.ResponseSuccess(c, "register success")
+	e, b := sentinel.Entry("chatchat_user", sentinel.WithTrafficType(base.Inbound))
+	if b != nil {
+		// 请求被拒绝，在此处进行处理
+		c.JSON(http.StatusTooManyRequests, gin.H{
+			"status":  429,
+			"message": "too many request",
+		})
 	} else {
-		utils.ResponseFail(c, fmt.Sprintf("register failed,%s", msg))
-	}
+		var user *model.User
+		if err := c.ShouldBind(&user); err != nil {
+			fmt.Println(err)
+			utils.ResponseFail(c, "verification failed")
+			return
+		}
+		// 传入用户名和密码
+		username := user.Username
+		password := user.Password
+		nickname := user.Nickname
+		mailID := user.MailID
+		EncryptPassword, err1 := utils.EncryptPassword(password) //加密密码
+		if err1 != nil {
+			utils.ResponseFail(c, "encrypt password failed")
+			return
+		}
+		flag2, msg := dao.AddUserCheck(username, password, nickname)
+		if !flag2 {
+			utils.ResponseFail(c, msg)
+			return
+		}
+		user.Password = EncryptPassword
+		//_ = redis.Set(c, fmt.Sprintf("%s:vip", username), "0", 0)
+		user.Nickname = nickname
+		user.Introduction = "这个人很懒，什么都没留下~"
+		user.Avatar = "http://test.violapioggia.cn/chatchatUsers/empty_avatar.png"
+		uid, err := redis.Get(c.Request.Context(), fmt.Sprintf("Rmail:%s", username))
+		if err != nil {
+			utils.ResponseFail(c, "verification code has expired")
+			return
+		}
+		if uid == "" || uid != mailID {
+			utils.ResponseFail(c, "wrong mailID")
+		}
 
+		user.ID = global.Rdb.ZCard(c.Request.Context(), "userID").Val() + 1
+		flag1, msg := mysql.AddUser(c.Request.Context(), username, password, nickname, user.ID) //写入数据库
+		if flag1 {
+			err := redis.ZSetUserID(c.Request.Context(), username)
+			if err != nil {
+				utils.ResponseFail(c, err.Error())
+			}
+			err = redis.HSet(c.Request.Context(), fmt.Sprintf("user:%s", username), "id", user.ID, "password", user.Password, "nickname", user.Nickname, "introduction", user.Introduction, "avatar", user.Avatar)
+			if err != nil {
+				utils.ResponseFail(c, err.Error())
+			}
+			utils.ResponseSuccess(c, "register success")
+		} else {
+			utils.ResponseFail(c, fmt.Sprintf("register failed,%s", msg))
+		}
+
+		e.Exit()
+	}
 }
 
 func login(c *gin.Context) {
-	//span := opentracing.StartSpan("login")
-	//
-	//if span == nil {
-	//	fmt.Println("nil span")
-	//	panic("nil span")
-	//}
-	//span.SetTag("custom_tag", "custom_value")
-	//span.LogFields(
-	//	log.String("event", "custom_event"),
-	//	log.String("message", "custom_message"),
-	//)
-	//defer span.Finish()
-	var user model.User
-	if err := c.ShouldBind(&user); err != nil {
-		fmt.Println(err)
-		utils.ResponseFail(c, "verification failed")
-		return
-	}
-	username := user.Username
-	password := user.Password
+	e, b := sentinel.Entry("chatchat_user", sentinel.WithTrafficType(base.Inbound))
+	if b != nil {
+		// 请求被拒绝，在此处进行处理
+		c.JSON(http.StatusTooManyRequests, gin.H{
+			"status":  429,
+			"message": "too many request",
+		})
+	} else {
+		var user model.User
+		if err := c.ShouldBind(&user); err != nil {
+			fmt.Println(err)
+			utils.ResponseFail(c, "verification failed")
+			return
+		}
+		username := user.Username
+		password := user.Password
 
-	flag, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "password")
-	if flag == "" {
-		utils.ResponseFail(c, "user doesn't exists")
+		flag, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "password")
+		if flag == "" {
+			utils.ResponseFail(c, "user doesn't exists")
+			return
+		}
+		RedisPassword, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "password")
+		if !utils.EqualsPassword(password, RedisPassword.(string)) {
+			utils.ResponseFail(c, "wrong password")
+			return
+		}
+		claim := model.MyClaims{
+			Username: username,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Add(time.Hour * 2).Unix(),
+				Issuer:    "Wzy",
+			},
+		}
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+		tokenString, _ := token.SignedString(middleware.Secret)
+		c.JSON(http.StatusOK, gin.H{
+			"status":  200,
+			"message": "login success",
+			"token":   tokenString,
+		})
+		c.Set("id", user.ID)
+		c.Next()
+		e.Exit()
 		return
 	}
-	RedisPassword, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "password")
-	if !utils.EqualsPassword(password, RedisPassword.(string)) {
-		utils.ResponseFail(c, "wrong password")
-		return
-	}
-	claim := model.MyClaims{
-		Username: username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 2).Unix(),
-			Issuer:    "Wzy",
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-	tokenString, _ := token.SignedString(middleware.Secret)
-	c.JSON(http.StatusOK, gin.H{
-		"status":  200,
-		"message": "login success",
-		"token":   tokenString,
-	})
-	c.Set("id", user.ID)
-	c.Next()
-	return
 }
 
 func ChangePassword(c *gin.Context) {

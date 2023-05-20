@@ -12,5 +12,6 @@ func main() {
 	boot.RedisSetup()
 	middleware.SessionSetup()
 	boot.JaegerSetup()
+	boot.SentinelSetup()
 	boot.ServerSetup()
 }
