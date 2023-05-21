@@ -8,8 +8,10 @@ import (
 	"chatchat/utils"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
+	"strconv"
 )
 
 func GetConn(c *gin.Context) {
@@ -149,7 +151,7 @@ func GWrite() {
 func GetOfflineMessage(c *gin.Context) {
 	id := c.GetInt("id")
 	cli := global.Rdb
-	len, err := cli.LLen(context.Background(), string(id)).Result()
+	len, err := cli.LLen(context.Background(), strconv.Itoa(id)).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
@@ -159,7 +161,7 @@ func GetOfflineMessage(c *gin.Context) {
 		utils.ResponseFail(c, err.Error())
 		return
 	}
-	defer cli.Del(context.Background(), string(id))
+	defer cli.Del(context.Background(), strconv.Itoa(id))
 
 	for _, res := range result {
 		var s model.Message
@@ -172,16 +174,49 @@ func GetOfflineMessage(c *gin.Context) {
 		continue
 	}
 }
-
-func GetAll(c *gin.Context) {
+func GetGroups(c *gin.Context) {
 	var (
-		friends  []int
-		friendid int
-		groupid  int
-		groups   []int
+		groupid int
+		group   string
+		groups  []string
 	)
+	uid, _ := c.Get("id")
+	db := global.MysqlDB
 
-	uid := c.GetInt("uid")
+	rows, err := db.Query("select group_id from `group_members` where user_id = ?", uid)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&groupid)
+		if err != nil {
+			utils.ResponseFail(c, err.Error())
+			return
+		}
+		_ = db.QueryRow("select group_name from `groups` where gid = ?", groupid).Scan(&group)
+		fmt.Println(group)
+		groups = append(groups, group)
+	}
+
+	c.JSON(200, gin.H{
+		"status": 200,
+		"groups": groups,
+	})
+}
+func GetFriends(c *gin.Context) {
+	type friend struct {
+		Nickname     string
+		Avatar       string
+		Introduction string
+	}
+	var (
+		friends        []friend
+		friendUsername string
+		friendid       int64
+	)
+	uid, _ := c.Get("id")
 
 	db := global.MysqlDB
 
@@ -197,10 +232,53 @@ func GetAll(c *gin.Context) {
 			utils.ResponseFail(c, err.Error())
 			return
 		}
-		friends = append(friends, friendid)
+		_ = db.QueryRow("select username from `user_bases` where id = ?", friendid).Scan(&friendUsername)
+		nickname, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", friendUsername), "nickname")
+		avatar, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", friendUsername), "avatar")
+		introduction, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", friendUsername), "introduction")
+		friend := friend{
+			Nickname:     nickname.(string),
+			Avatar:       avatar.(string),
+			Introduction: introduction.(string),
+		}
+		friends = append(friends, friend)
 	}
 
-	rows, err = db.Query("select fid from `groups` where uid = ?", uid)
+	c.JSON(200, gin.H{
+		"status":  200,
+		"friends": friends,
+	})
+}
+func GetAll(c *gin.Context) {
+	var (
+		friends  []string
+		friend   string
+		friendid int64
+		groupid  int
+		group    string
+		groups   []string
+	)
+	uid, _ := c.GetPostForm("uid")
+
+	db := global.MysqlDB
+
+	rows, err := db.Query("select fid from `friend` where uid = ?", uid)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&friendid)
+		if err != nil {
+			utils.ResponseFail(c, err.Error())
+			return
+		}
+		_ = db.QueryRow("select nickname from `user_bases` where id = ?", friendid).Scan(&friend)
+		friends = append(friends, friend)
+	}
+
+	rows, err = db.Query("select group_id from `group_members` where user_id = ?", uid)
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
@@ -212,9 +290,14 @@ func GetAll(c *gin.Context) {
 			utils.ResponseFail(c, err.Error())
 			return
 		}
-		friends = append(groups, groupid)
+		_ = db.QueryRow("select group_name from `groups` where gid = ?", groupid).Scan(&group)
+		fmt.Println(group)
+		groups = append(groups, group)
 	}
 
-	c.JSON(200, groups)
-	c.JSON(200, friends)
+	c.JSON(200, gin.H{
+		"status":  200,
+		"friends": friends,
+		"groups":  groups,
+	})
 }

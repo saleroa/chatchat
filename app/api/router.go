@@ -62,7 +62,9 @@ func InitRouter() error {
 
 	ChatRouter := r.Group("/chat")
 	{
-		ChatRouter.GET("/getAll", GetAll)
+		ChatRouter.Use(middleware.JWTAuthMiddleware())
+		ChatRouter.GET("/getGroups", GetGroups)
+		ChatRouter.GET("/getFriends", GetFriends)
 		ChatRouter.GET("/conn", GetConn)
 	}
 

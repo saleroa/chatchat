@@ -1,4 +1,3 @@
-
 CREATE TABLE `groups` (
                         gid int unsigned auto_increment primary key ,
                         group_name VARCHAR(255) NOT NULL unique,
@@ -14,9 +13,3 @@ CREATE TABLE group_members (
                                FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
-
-CREATE TABLE user (
-                      id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                      username VARCHAR(50) NOT NULL UNIQUE,
-                      password CHAR(60) NOT NULL
-);

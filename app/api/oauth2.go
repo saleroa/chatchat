@@ -181,7 +181,10 @@ func Oauth2Pwd(c *gin.Context) {
 	//io.Copy(c.Writer, resp.Body)
 	username1, _ := redis.HGet(c, "Oauth2User", strconv.FormatInt(user.Oauth2Username, 10))
 	if username1 != "" {
+		userID, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", username1), "id")
+		id, _ := strconv.ParseInt(userID.(string), 10, 64)
 		claim := model.MyClaims{
+			ID:       id,
 			Username: username1.(string),
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: time.Now().Add(time.Hour * 2).Unix(),

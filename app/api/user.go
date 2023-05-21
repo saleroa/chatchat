@@ -14,6 +14,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -59,6 +60,7 @@ func register(c *gin.Context) {
 		}
 		if uid == "" || uid != mailID {
 			utils.ResponseFail(c, "wrong mailID")
+			return
 		}
 
 		user.ID = global.Rdb.ZCard(c.Request.Context(), "userID").Val() + 1
@@ -67,16 +69,19 @@ func register(c *gin.Context) {
 			err := redis.ZSetUserID(c.Request.Context(), username)
 			if err != nil {
 				utils.ResponseFail(c, err.Error())
+				return
 			}
 			err = redis.HSet(c.Request.Context(), fmt.Sprintf("user:%s", username), "id", user.ID, "password", user.Password, "nickname", user.Nickname, "introduction", user.Introduction, "avatar", user.Avatar)
 			if err != nil {
 				utils.ResponseFail(c, err.Error())
+				return
 			}
 			utils.ResponseSuccess(c, "register success")
+
 		} else {
 			utils.ResponseFail(c, fmt.Sprintf("register failed,%s", msg))
+			return
 		}
-
 		e.Exit()
 	}
 }
@@ -98,6 +103,8 @@ func login(c *gin.Context) {
 		}
 		username := user.Username
 		password := user.Password
+		id, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "id")
+		user.ID, _ = strconv.ParseInt(id.(string), 10, 64)
 
 		flag, _ := redis.HGet(c, fmt.Sprintf("user:%s", username), "password")
 		if flag == "" {
@@ -111,6 +118,7 @@ func login(c *gin.Context) {
 		}
 		claim := model.MyClaims{
 			Username: username,
+			ID:       user.ID,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: time.Now().Add(time.Hour * 2).Unix(),
 				Issuer:    "Wzy",
