@@ -174,11 +174,17 @@ func GetOfflineMessage(c *gin.Context) {
 		continue
 	}
 }
+
+type Group struct {
+	Gid  int
+	Name string
+}
+
 func GetGroups(c *gin.Context) {
 	var (
 		groupid int
-		group   string
-		groups  []string
+		group   Group
+		groups  []Group
 	)
 	uid, _ := c.Get("id")
 	db := global.MysqlDB
@@ -195,8 +201,8 @@ func GetGroups(c *gin.Context) {
 			utils.ResponseFail(c, err.Error())
 			return
 		}
-		_ = db.QueryRow("select group_name from `groups` where gid = ?", groupid).Scan(&group)
-		fmt.Println(group)
+		_ = db.QueryRow("select group_name from `groups` where gid = ?", groupid).Scan(&group.Name)
+		group.Gid = groupid
 		groups = append(groups, group)
 	}
 

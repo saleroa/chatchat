@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 func AddFriend(c *gin.Context) {
@@ -19,6 +20,10 @@ func AddFriend(c *gin.Context) {
 	}
 	db := global.MysqlDB
 	fid, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", Fusername), "id")
+	if strconv.FormatInt(uid.(int64), 10) == fid.(string) {
+		utils.ResponseFail(c, "you can't add yourself!")
+		return
+	}
 	var test int64
 	err := db.QueryRow("SELECT 1 FROM friend WHERE uid = ? AND fid = ?", uid, fid).Scan(&test)
 	if err != nil && err != sql.ErrNoRows {

@@ -4,17 +4,12 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="update">
+    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: add chat functions">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/chat.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/friend.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/friend.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/group.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/group.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/oauth2.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/oauth2.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/user.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/main" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/group.sql" beforeDir="false" afterPath="$PROJECT_DIR$/model/group.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/message.sql" beforeDir="false" afterPath="$PROJECT_DIR$/model/message.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +34,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectId" id="2Pp4nRlQrSCyE3ro8oqpwkenVZf" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -139,7 +134,8 @@
     <MESSAGE value="feat:add jaeger tracer" />
     <MESSAGE value="feat:add sentinel" />
     <MESSAGE value="update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <MESSAGE value="feat: add chat functions" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add chat functions" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

@@ -65,8 +65,8 @@ func InitRouter() error {
 		ChatRouter.Use(middleware.JWTAuthMiddleware())
 		ChatRouter.GET("/getGroups", GetGroups)
 		ChatRouter.GET("/getFriends", GetFriends)
-		ChatRouter.GET("/conn", GetConn)
 	}
+	r.GET("/chat/conn", GetConn)
 
 	err := r.Run(":8088")
 	if err != nil {
