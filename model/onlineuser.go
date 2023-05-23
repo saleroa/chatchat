@@ -21,6 +21,7 @@ func (ou OnLineUser) Read() {
 		case message, ok := <-ou.ReadChannel:
 			if !ok {
 				log.Printf("%s ReadService close", ou.UserId)
+				return
 			}
 			ou.WriteChannel <- message
 		}
@@ -33,13 +34,16 @@ func (ou OnLineUser) Write() {
 	for {
 		select {
 		case message, ok := <-ou.WriteChannel:
+			//close(ou.WriteChannel)
 			if !ok {
 				log.Printf("%s WriteService close", ou.UserId)
+				return
 			}
 			err := ou.Coon.WriteJSON(message)
 
 			if err != nil {
 				log.Printf("%sWrite Err:%s\n", ou.UserId, err.Error())
+				return
 			}
 
 		}

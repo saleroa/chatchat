@@ -19,7 +19,6 @@ func InsertAndCacheData(db *sql.DB, cli *redis.Client, message model.Message) er
 	if err != nil {
 		log.Println(err)
 		return err
-
 	}
 	err = rdb.InsertIntoRedis(cli, message, key)
 	if err != nil {

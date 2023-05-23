@@ -21,7 +21,8 @@ func GetConn(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	id := c.GetInt("id")
+	ID, _ := c.GetQuery("id")
+	id, _ := strconv.Atoi(ID)
 	client := &model.OnLineUser{
 		UserId:       id,
 		Coon:         coon,
@@ -35,7 +36,6 @@ func GetConn(c *gin.Context) {
 
 	go client.Read()
 	go client.Write()
-
 	Run(client)
 }
 
@@ -57,7 +57,6 @@ func Run(client *model.OnLineUser) {
 			close(client.WriteChannel)
 			return
 		}
-
 		message := &model.Message{}
 		err = json.Unmarshal(msg, message)
 		if err != nil {
@@ -108,12 +107,23 @@ func GWrite() {
 					}
 				}
 				//用户在线
+				fmt.Println("GWrite2")
+				if onLineUser == nil {
+					fmt.Println("onLineUser is nil")
+					return
+				}
+
+				if onLineUser.ReadChannel == nil {
+					fmt.Println("onLineUser.ReadChannel is nil")
+					return
+				}
 				onLineUser.ReadChannel <- *message
 				//缓存
 				err := dao.InsertAndCacheData(db, cli, *message)
 				if err != nil {
 					return
 				}
+				fmt.Println("GWrite4")
 			}
 			//群发逻辑
 
