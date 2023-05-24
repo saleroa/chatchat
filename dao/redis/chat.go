@@ -7,19 +7,25 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"log"
+	"strconv"
 	"time"
 )
 
 func InsertIntoRedis(cli *redis.Client, message model.Message, key string) error {
 	// 将数据缓存到 Redis 中
-	id := fmt.Sprintf("%sto%s", message.FromId, message.TargetId)
-
-	err := cli.HSet(context.Background(), key, "time", message.Time, "content", message.Content, "id", id, "sendtype", message.SendType).Err()
-	if err != nil {
-		log.Println()
-		return err
+	msg, _ := json.Marshal(message)
+	if message.SendType == 1 {
+		err := cli.RPush(context.Background(), fmt.Sprintf("friend:%s", key), msg).Err()
+		if err != nil {
+			return err
+		}
+	} else if message.SendType == 2 {
+		err := cli.RPush(context.Background(), fmt.Sprintf("group:%s", key), msg).Err()
+		if err != nil {
+			return err
+		}
 	}
-	err = cli.Expire(context.Background(), key, 24*7*time.Hour).Err()
+	err := cli.Expire(context.Background(), key, 24*7*time.Hour).Err()
 	if err != nil {
 		log.Println()
 		return err
@@ -33,7 +39,7 @@ func SaveOfflineMessage(message model.Message, cli *redis.Client) error {
 	if err != nil {
 		return err
 	}
-	err = cli.LPush(context.Background(), string(message.TargetId), msg).Err()
+	err = cli.RPush(context.Background(), strconv.Itoa(message.TargetId), msg).Err()
 	if err != nil {
 		return err
 	}

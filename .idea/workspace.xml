@@ -7,11 +7,11 @@
     <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: update chat functions">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/chat.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/middleware/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/middleware/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/group.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/group.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/router.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/main" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dao/insertandcachedata.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/insertandcachedata.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/mysql/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/mysql/chat.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/onlineuser.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/onlineuser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dao/redis/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/redis/chat.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

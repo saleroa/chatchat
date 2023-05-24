@@ -105,7 +105,17 @@ func ExitGroup(c *gin.Context) {
 	gid, _ := strconv.Atoi(c.PostForm("gid"))
 
 	db := global.MysqlDB
-	_, err := db.Exec("delete from `group_members` where group_id = ? and user_id = ?", gid, uid)
+	var identity int
+	err := db.QueryRow("select identity from `group_members` where group_id = ? and user_id = ?", gid, uid).Scan(&identity)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	if identity == 1 {
+		utils.ResponseFail(c, "manager can't leave the group")
+		return
+	}
+	_, err = db.Exec("delete from `group_members` where group_id = ? and user_id = ?", gid, uid)
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
@@ -164,5 +174,52 @@ func SearchGroup(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status": 200,
 		"group":  group,
+	})
+}
+
+func GetMembers(c *gin.Context) {
+	gid, flag := c.GetPostForm("gid")
+	if flag == false {
+		utils.ResponseFail(c, "请输入群聊id")
+		return
+	}
+	db := global.MysqlDB
+	type member struct {
+		Nickname     string
+		Avatar       string
+		Introduction string
+	}
+	var (
+		members        []member
+		memberusername string
+		memberid       int64
+	)
+
+	rows, err := db.Query("select user_id from `group_members` where group_id = ?", gid)
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&memberid)
+		if err != nil {
+			utils.ResponseFail(c, err.Error())
+			return
+		}
+		_ = db.QueryRow("select username from `user_bases` where id = ?", memberid).Scan(&memberusername)
+		nickname, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", memberusername), "nickname")
+		avatar, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", memberusername), "avatar")
+		introduction, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", memberusername), "introduction")
+		member := member{
+			Nickname:     nickname.(string),
+			Avatar:       avatar.(string),
+			Introduction: introduction.(string),
+		}
+		members = append(members, member)
+	}
+	c.JSON(200, gin.H{
+		"status":  200,
+		"friends": members,
 	})
 }

@@ -102,71 +102,65 @@ func GWrite() {
 					//用户不在线
 
 					err := redis.SaveOfflineMessage(*message, cli)
-					if err != nil {
+					err1 := dao.InsertAndCacheData(db, cli, *message)
+					if err != nil || err1 != nil {
 						return
 					}
-				}
-				//用户在线
-				fmt.Println("GWrite2")
-				if onLineUser == nil {
-					fmt.Println("onLineUser is nil")
-					return
-				}
-
-				if onLineUser.ReadChannel == nil {
-					fmt.Println("onLineUser.ReadChannel is nil")
-					return
-				}
-				onLineUser.ReadChannel <- *message
-				//缓存
-				err := dao.InsertAndCacheData(db, cli, *message)
-				if err != nil {
-					return
-				}
-				fmt.Println("GWrite4")
-			}
-			//群发逻辑
-
-			rows, err := db.Query("select user_id from `group_members` where group_id = ?", message.TargetId)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			for rows.Next() {
-				var uid int
-				rows.Scan(&uid)
-
-				//群聊用户在线
-				if global.OnlineMap[uid] != nil {
-
-					global.OnlineMap[uid].ReadChannel <- *message
+				} else {
+					//用户在线
+					onLineUser.ReadChannel <- *message
+					//缓存
 					err := dao.InsertAndCacheData(db, cli, *message)
 					if err != nil {
 						return
 					}
 				}
-				//群聊用户不在线
-				err := redis.SaveOfflineMessage(*message, cli)
+			} else if message.SendType == 2 {
+
+				//群发逻辑
+
+				rows, err := db.Query("select user_id from `group_members` where group_id = ?", message.TargetId)
 				if err != nil {
+					log.Println(err)
 					return
 				}
+				for rows.Next() {
+					var uid int
+					rows.Scan(&uid)
 
+					//群聊用户在线
+					if global.OnlineMap[uid] != nil {
+
+						global.OnlineMap[uid].ReadChannel <- *message
+						err := dao.InsertAndCacheData(db, cli, *message)
+						if err != nil {
+							return
+						}
+					} else {
+						//群聊用户不在线
+						err := redis.SaveOfflineMessage(*message, cli)
+						if err != nil {
+							return
+						}
+					}
+				}
 			}
-
 		}
 	}
 }
 
 // 上线后第一件事，读取离线消息
 func GetOfflineMessage(c *gin.Context) {
-	id := c.GetInt("id")
+	ID, _ := c.GetQuery("id")
+	id, _ := strconv.Atoi(ID)
+	fmt.Println(id)
 	cli := global.Rdb
 	len, err := cli.LLen(context.Background(), strconv.Itoa(id)).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
 	}
-	result, err := cli.LRange(context.Background(), "", 0, len-1).Result()
+	result, err := cli.LRange(context.Background(), strconv.Itoa(id), 0, len-1).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
@@ -315,5 +309,39 @@ func GetAll(c *gin.Context) {
 		"status":  200,
 		"friends": friends,
 		"groups":  groups,
+	})
+}
+func GetFriendMessage(c *gin.Context) {
+	ID, _ := c.Get("id")
+	id := ID.(int64)
+	value2, _ := c.GetPostForm("toid")
+	toid, _ := strconv.ParseInt(value2, 10, 64)
+	if id > toid {
+		id, toid = toid, id
+	}
+	key := fmt.Sprintf("friend:%dto%d", id, toid)
+	cli := global.Rdb
+	len, err := cli.LLen(context.Background(), key).Result()
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	result, err := cli.LRange(context.Background(), key, 0, len-1).Result()
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	var msgs []model.Message
+	for _, res := range result {
+		var msg model.Message
+		if err := json.Unmarshal([]byte(res), &msg); err != nil {
+			utils.ResponseFail(c, err.Error())
+		}
+		msgs = append(msgs, msg)
+		continue
+	}
+	c.JSON(200, gin.H{
+		"status":  200,
+		"message": msgs,
 	})
 }

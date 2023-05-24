@@ -17,7 +17,7 @@ func InitRouter() error {
 	r.Use(ginhttp.Middleware(opentracing.GlobalTracer()))
 
 	r.POST("/register", register)
-	r.POST("/login", login, GetOfflineMessage) // 钩子函数，上线就读取离线消息
+	r.POST("/login", login) // 钩子函数，上线就读取离线消息
 	r.POST("/verificationID", SendMail)
 	r.POST("/RVerificationID", RSendMail)
 
@@ -50,6 +50,7 @@ func InitRouter() error {
 		GroupRouter.POST("/kickOut", KickOut)
 		GroupRouter.DELETE("/deleteGroup", DeleteGroup)
 		GroupRouter.POST("/searchGroup", SearchGroup)
+		GroupRouter.GET("/getMembers", GetMembers)
 
 	}
 
@@ -65,7 +66,9 @@ func InitRouter() error {
 		ChatRouter.Use(middleware.JWTAuthMiddleware())
 		ChatRouter.GET("/getGroups", GetGroups)
 		ChatRouter.GET("/getFriends", GetFriends)
+		ChatRouter.GET("/getFriendMessage", GetFriendMessage)
 	}
+	r.GET("/chat/getOffMsg", GetOfflineMessage)
 	r.GET("/chat/conn", GetConn)
 
 	err := r.Run(":8088")
