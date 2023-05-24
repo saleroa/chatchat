@@ -7,11 +7,13 @@ import (
 	"chatchat/model"
 	"chatchat/utils"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"strconv"
+	"time"
 )
 
 func GetConn(c *gin.Context) {
@@ -63,6 +65,8 @@ func Run(client *model.OnLineUser) {
 			log.Println(err)
 			return
 		}
+		message.Time = time.Now()
+		fmt.Println(message.Time)
 		global.GReadChannel <- message
 
 	}
@@ -101,7 +105,7 @@ func GWrite() {
 				if onLineUser == nil {
 					//用户不在线
 
-					err := redis.SaveOfflineMessage(*message, cli)
+					err := redis.SaveOfflineMessage(*message, cli, 0)
 					err1 := dao.InsertAndCacheData(db, cli, *message)
 					if err != nil || err1 != nil {
 						return
@@ -129,16 +133,16 @@ func GWrite() {
 					rows.Scan(&uid)
 
 					//群聊用户在线
-					if global.OnlineMap[uid] != nil {
-
-						global.OnlineMap[uid].ReadChannel <- *message
-						err := dao.InsertAndCacheData(db, cli, *message)
+					if global.OnlineMap[uid] == nil {
+						//群聊用户不在线
+						err := redis.SaveOfflineMessage(*message, cli, int64(uid))
 						if err != nil {
 							return
 						}
-					} else {
-						//群聊用户不在线
-						err := redis.SaveOfflineMessage(*message, cli)
+					}
+					if uid == message.FromId {
+						global.OnlineMap[uid].ReadChannel <- *message
+						err := dao.InsertAndCacheData(db, cli, *message)
 						if err != nil {
 							return
 						}
@@ -151,8 +155,8 @@ func GWrite() {
 
 // 上线后第一件事，读取离线消息
 func GetOfflineMessage(c *gin.Context) {
-	ID, _ := c.GetQuery("id")
-	id, _ := strconv.Atoi(ID)
+	ID, _ := c.Get("id")
+	id, _ := ID.(int)
 	fmt.Println(id)
 	cli := global.Rdb
 	len, err := cli.LLen(context.Background(), strconv.Itoa(id)).Result()
@@ -314,7 +318,11 @@ func GetAll(c *gin.Context) {
 func GetFriendMessage(c *gin.Context) {
 	ID, _ := c.Get("id")
 	id := ID.(int64)
-	value2, _ := c.GetPostForm("toid")
+	value2, _ := c.GetQuery("toid")
+	Size, _ := c.GetQuery("size")
+	size, _ := strconv.ParseInt(Size, 10, 64)
+	Offset, _ := c.GetQuery("offset")
+	offset, _ := strconv.ParseInt(Offset, 10, 64)
 	toid, _ := strconv.ParseInt(value2, 10, 64)
 	if id > toid {
 		id, toid = toid, id
@@ -326,7 +334,54 @@ func GetFriendMessage(c *gin.Context) {
 		utils.ResponseFail(c, err.Error())
 		return
 	}
-	result, err := cli.LRange(context.Background(), key, 0, len-1).Result()
+	fmt.Println(len, offset, size)
+	result, err := cli.LRange(context.Background(), key, offset, offset+size-1).Result()
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	var msgs []model.Message
+	for _, res := range result {
+		var msg model.Message
+		if err := json.Unmarshal([]byte(res), &msg); err != nil {
+			utils.ResponseFail(c, err.Error())
+		}
+		msgs = append(msgs, msg)
+		continue
+	}
+	c.JSON(200, gin.H{
+		"status":  200,
+		"message": msgs,
+	})
+}
+func GetGroupMessage(c *gin.Context) {
+	ID, _ := c.Get("id")
+	id := ID.(int64)
+	value2, _ := c.GetQuery("gid")
+	Size, _ := c.GetQuery("size")
+	size, _ := strconv.ParseInt(Size, 10, 64)
+	Offset, _ := c.GetQuery("offset")
+	offset, _ := strconv.ParseInt(Offset, 10, 64)
+	gid, _ := strconv.ParseInt(value2, 10, 64)
+	key := fmt.Sprintf("group:%d", gid)
+	cli := global.Rdb
+	db := global.MysqlDB
+	identity := -1
+	err := db.QueryRow("SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?", gid, id).Scan(&identity)
+	if err != nil && err != sql.ErrNoRows {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	if identity == -1 {
+		utils.ResponseFail(c, "you do not have the access to search the message")
+		return
+	}
+	//len, err := cli.LLen(context.Background(), key).Result()
+	//if err != nil {
+	//	utils.ResponseFail(c, err.Error())
+	//	return
+	//}
+	result, err := cli.LRange(context.Background(), key, offset, offset+size-1).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return

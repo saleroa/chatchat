@@ -17,7 +17,7 @@ func InitRouter() error {
 	r.Use(ginhttp.Middleware(opentracing.GlobalTracer()))
 
 	r.POST("/register", register)
-	r.POST("/login", login) // 钩子函数，上线就读取离线消息
+	r.POST("/login", login)
 	r.POST("/verificationID", SendMail)
 	r.POST("/RVerificationID", RSendMail)
 
@@ -67,8 +67,9 @@ func InitRouter() error {
 		ChatRouter.GET("/getGroups", GetGroups)
 		ChatRouter.GET("/getFriends", GetFriends)
 		ChatRouter.GET("/getFriendMessage", GetFriendMessage)
+		ChatRouter.GET("/getGroupMessage", GetGroupMessage)
+		ChatRouter.GET("/getOffMsg", GetOfflineMessage)
 	}
-	r.GET("/chat/getOffMsg", GetOfflineMessage)
 	r.GET("/chat/conn", GetConn)
 
 	err := r.Run(":8088")

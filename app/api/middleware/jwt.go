@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"chatchat/model"
+	"context"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-
 	"net/http"
 	"strings"
 )
@@ -51,6 +51,30 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		c.Set("id", mc.ID)
 		c.Set("username", mc.Username)
 		c.Next() // 后续的处理函数可以用过c.Get("username")来获取当前请求的用户信息
+	}
+}
+
+func WebsocketJWT() func(r *http.Request) bool {
+	return func(r *http.Request) bool {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			return false
+		}
+		// 按空格分割
+		parts := strings.SplitN(authHeader, " ", 2)
+		if !(len(parts) == 2 && parts[0] == "Bearer") {
+
+			return false
+		}
+		// parts[1]是获取到的tokenString，我们使用之前定义好的解析JWT的函数来解析它
+		mc, err := ParseToken(parts[1])
+		if err != nil {
+			return false
+		}
+		// 将当前请求的username信息保存到请求的上下文c上
+		context.WithValue(r.Context(), "id", mc.ID)
+		context.WithValue(r.Context(), "username", mc.Username)
+		return true
 	}
 }
 

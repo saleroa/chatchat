@@ -23,9 +23,13 @@ func SendMail(c *gin.Context) {
 		utils.ResponseFail(c, msg)
 		return
 	}
+	v, _ := redis.Get(c, fmt.Sprintf("mail:%s", username))
+	if v != "" {
+		utils.ResponseFail(c, "mailID has been exits,please try 2 min later")
+	}
 	uid := utils.GetVerificationID()
 	Mail(username, uid)
-	err := redis.Set(c, fmt.Sprintf("mail:%s", username), uid, 5*time.Minute)
+	err := redis.Set(c, fmt.Sprintf("mail:%s", username), uid, 2*time.Minute)
 	if err != nil {
 		utils.ResponseFail(c, "write mailID into redis failed")
 		return
@@ -50,9 +54,13 @@ func RSendMail(c *gin.Context) {
 		utils.ResponseFail(c, msg)
 		return
 	}
+	v, _ := redis.Get(c, fmt.Sprintf("Rmail:%s", username))
+	if v != "" {
+		utils.ResponseFail(c, "mailID has been exits,please try 2 min later")
+	}
 	uid := utils.GetVerificationID()
 	Mail(username, uid)
-	err := redis.Set(c, fmt.Sprintf("Rmail:%s", username), uid, 5*time.Minute)
+	err := redis.Set(c, fmt.Sprintf("Rmail:%s", username), uid, 2*time.Minute)
 	if err != nil {
 		utils.ResponseFail(c, "write mailID into redis failed")
 		return

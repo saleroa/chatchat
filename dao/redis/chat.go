@@ -34,14 +34,21 @@ func InsertIntoRedis(cli *redis.Client, message model.Message, key string) error
 }
 
 // 插入离线消息
-func SaveOfflineMessage(message model.Message, cli *redis.Client) error {
+func SaveOfflineMessage(message model.Message, cli *redis.Client, uid int64) error {
 	msg, err := json.Marshal(message)
 	if err != nil {
 		return err
 	}
-	err = cli.RPush(context.Background(), strconv.Itoa(message.TargetId), msg).Err()
-	if err != nil {
-		return err
+	if message.SendType == 1 {
+		err = cli.RPush(context.Background(), strconv.Itoa(message.TargetId), msg).Err()
+		if err != nil {
+			return err
+		}
+	} else if message.SendType == 2 {
+		err = cli.RPush(context.Background(), strconv.Itoa(int(uid)), msg).Err()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
