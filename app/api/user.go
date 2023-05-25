@@ -273,49 +273,6 @@ func ChangeIntroduction(c *gin.Context) {
 	}
 	utils.ResponseSuccess(c, "change introduction success")
 }
-
-//	func ChangeAvatar(c *gin.Context) {
-//		username, _ := c.Get("username")
-//		id := global.Rdb.Get(c, fmt.Sprintf("%s:%s", username, "id")).Val()
-//		ID, _ := global.Rdb.Get(c, fmt.Sprintf("%s:%s", username, "id")).Int64()
-//		c.Param(id)
-//		var user model.User
-//		c.ShouldBind(&user)
-//		avatar := user.Avatar
-//		u := model.User{
-//			Username: fmt.Sprintf("%s", username),
-//			Avatar:   avatar,
-//			ID:       ID,
-//		}
-//		flag2, msg := mysql.ChangeAvatar(u)
-//		if flag2 {
-//		} else {
-//			utils.ResponseFail(c, fmt.Sprintf("avatar change failed,%s", msg))
-//			return
-//		} //更新数据库数据
-//		global.Rdb.Del(c, fmt.Sprintf("%s:avatar", username), avatar)      //删除缓存中的键值对
-//		err := redis.Set(c, fmt.Sprintf("%s:avatar", username), avatar, 0) //重新写入到redis
-//		if err != nil {
-//			utils.ResponseFail(c, "write into redis failed")
-//			return
-//		}
-//		utils.ResponseSuccess(c, "change avatar success")
-//	}
-//
-//	func getUsernameFromToken(c *gin.Context) {
-//		username, _ := c.Get("username")
-//		utils.ResponseSuccess(c, username.(string))
-//	}
-//
-//	func FindPassword(c *gin.Context) {
-//		username := c.PostForm("username")
-//		password,_ := redis.HGet(c,"user:%s",username,"password")
-//		if password=="" {
-//			utils.ResponseFail(c, "user doesn't exists")
-//			return
-//		}
-//		utils.ResponseSuccess(c, password.(string))
-//	}
 func GetUser(c *gin.Context) {
 	username, _ := c.Get("username")
 	id, _ := global.Rdb.HGet(c, fmt.Sprintf("user:%s", username), "id").Int64()
@@ -334,12 +291,6 @@ func GetUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
-		//"username":     username,
-		//"avatar":       avatar,
-		//"nickname":     nickname,
-		//"introduction": introduction,
-		//"id":           id,
 		"data": user,
-		//"likeArticle":  likeArticle,
 	})
 }

@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/gorilla/websocket"
 	"log"
+	"time"
 )
 
 type OnLineUser struct {
@@ -39,6 +40,7 @@ func (ou OnLineUser) Write() {
 				log.Printf("%s WriteService close", ou.UserId)
 				return
 			}
+			message.Time = time.Now()
 			err := ou.Coon.WriteJSON(message)
 
 			if err != nil {

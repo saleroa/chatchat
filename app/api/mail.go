@@ -26,6 +26,7 @@ func SendMail(c *gin.Context) {
 	v, _ := redis.Get(c, fmt.Sprintf("mail:%s", username))
 	if v != "" {
 		utils.ResponseFail(c, "mailID has been exits,please try 2 min later")
+		return
 	}
 	uid := utils.GetVerificationID()
 	Mail(username, uid)

@@ -185,6 +185,8 @@ func GetMembers(c *gin.Context) {
 	}
 	db := global.MysqlDB
 	type member struct {
+		ID           int64
+		Username     string
 		Nickname     string
 		Avatar       string
 		Introduction string
@@ -212,6 +214,8 @@ func GetMembers(c *gin.Context) {
 		avatar, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", memberusername), "avatar")
 		introduction, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", memberusername), "introduction")
 		member := member{
+			ID:           memberid,
+			Username:     memberusername,
 			Nickname:     nickname.(string),
 			Avatar:       avatar.(string),
 			Introduction: introduction.(string),
@@ -220,6 +224,6 @@ func GetMembers(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{
 		"status":  200,
-		"friends": members,
+		"members": members,
 	})
 }

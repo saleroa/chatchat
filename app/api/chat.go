@@ -221,6 +221,7 @@ func GetGroups(c *gin.Context) {
 }
 func GetFriends(c *gin.Context) {
 	type friend struct {
+		ID           int64
 		Nickname     string
 		Avatar       string
 		Introduction string
@@ -251,6 +252,7 @@ func GetFriends(c *gin.Context) {
 		avatar, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", friendUsername), "avatar")
 		introduction, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", friendUsername), "introduction")
 		friend := friend{
+			ID:           friendid,
 			Nickname:     nickname.(string),
 			Avatar:       avatar.(string),
 			Introduction: introduction.(string),

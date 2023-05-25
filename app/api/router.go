@@ -50,7 +50,7 @@ func InitRouter() error {
 		GroupRouter.POST("/kickOut", KickOut)
 		GroupRouter.DELETE("/deleteGroup", DeleteGroup)
 		GroupRouter.POST("/searchGroup", SearchGroup)
-		GroupRouter.GET("/getMembers", GetMembers)
+		GroupRouter.POST("/getMembers", GetMembers)
 
 	}
 
