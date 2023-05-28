@@ -4,15 +4,10 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: update a lot">
+    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/chat.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/group.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/group.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/mail.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/mail.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/user.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/main" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/onlineuser.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/onlineuser.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +136,8 @@
     <MESSAGE value="feat: update chat functions" />
     <MESSAGE value="feat: update `get message`" />
     <MESSAGE value="feat: update a lot" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update a lot" />
+    <MESSAGE value="feat: update" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

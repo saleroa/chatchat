@@ -331,13 +331,14 @@ func GetFriendMessage(c *gin.Context) {
 	}
 	key := fmt.Sprintf("friend:%dto%d", id, toid)
 	cli := global.Rdb
-	len, err := cli.LLen(context.Background(), key).Result()
+	lenth, err := cli.LLen(context.Background(), key).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
 	}
-	fmt.Println(len, offset, size)
-	result, err := cli.LRange(context.Background(), key, offset, offset+size-1).Result()
+	//fmt.Println(len, offset, size)
+	result, err := cli.LRange(context.Background(), key, lenth-(offset+1)*size, lenth-offset*size-1).Result()
+
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
@@ -378,12 +379,12 @@ func GetGroupMessage(c *gin.Context) {
 		utils.ResponseFail(c, "you do not have the access to search the message")
 		return
 	}
-	//len, err := cli.LLen(context.Background(), key).Result()
-	//if err != nil {
-	//	utils.ResponseFail(c, err.Error())
-	//	return
-	//}
-	result, err := cli.LRange(context.Background(), key, offset, offset+size-1).Result()
+	lenth, err := cli.LLen(context.Background(), key).Result()
+	if err != nil {
+		utils.ResponseFail(c, err.Error())
+		return
+	}
+	result, err := cli.LRange(context.Background(), key, lenth-(offset+1)*size, lenth-offset*size-1).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
