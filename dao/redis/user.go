@@ -19,6 +19,7 @@ func HGet(ctx context.Context, key, field string) (interface{}, error) {
 	if GetKey.Err() != nil {
 		span.SetTag("error", true)
 		span.SetTag("error_info", fmt.Sprintf("redis HGet value from %s failed", key))
+		global.Logger.Error(GetKey.Err().Error())
 		return "", GetKey.Err()
 	}
 	return GetKey.Val(), nil
@@ -49,6 +50,7 @@ func HSet(ctx context.Context, key string, value ...interface{}) error {
 	if SetKV.Err() != nil {
 		span.SetTag("error", true)
 		span.SetTag("error_info", fmt.Sprintf("redis set %s to %s failed", value, key))
+		global.Logger.Error(SetKV.Err().Error())
 	}
 	return SetKV.Err()
 }
@@ -60,6 +62,7 @@ func Set(ctx context.Context, key string, value interface{}, time time.Duration)
 	if SetKV.Err() != nil {
 		span.SetTag("error", true)
 		span.SetTag("error_info", fmt.Sprintf("redis set value from %s to %s failed", value, key))
+		global.Logger.Error(SetKV.Err().Error())
 	}
 	return SetKV.Err()
 }
@@ -71,6 +74,7 @@ func Get(ctx context.Context, key string) (string, error) {
 	if GetKey.Err() != nil {
 		span.SetTag("error", true)
 		span.SetTag("error_info", fmt.Sprintf("redis get value from %s failed", key))
+		global.Logger.Error(GetKey.Err().Error())
 		return "", GetKey.Err()
 	}
 	return GetKey.Val(), nil
@@ -90,6 +94,7 @@ func ZSetUserID(ctx context.Context, username string) error {
 	if SetKV.Err() != nil {
 		span.SetTag("error", true)
 		span.SetTag("error_info", fmt.Sprintf("redis ZSetUserID from %s failed", username))
+		global.Logger.Error(SetKV.Err().Error())
 	}
 	return SetKV.Err()
 }
@@ -100,6 +105,7 @@ func ZGet(ctx context.Context, key string, member string) (error, interface{}) {
 	if GetKey.Err() != nil {
 		span.SetTag("error", true)
 		span.SetTag("error_info", fmt.Sprintf("redis get value from %s failed", key))
+		global.Logger.Error(GetKey.Err().Error())
 		return GetKey.Err(), ""
 	}
 	return nil, GetKey.Val()

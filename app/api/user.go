@@ -49,7 +49,6 @@ func register(c *gin.Context) {
 			return
 		}
 		user.Password = EncryptPassword
-		//_ = redis.Set(c, fmt.Sprintf("%s:vip", username), "0", 0)
 		user.Nickname = nickname
 		user.Introduction = "这个人很懒，什么都没留下~"
 		user.Avatar = "http://test.violapioggia.cn/chatchatUsers/empty_avatar.png"

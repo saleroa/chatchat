@@ -139,13 +139,14 @@ func GWrite() {
 						if err != nil {
 							return
 						}
-					}
-					if uid == message.FromId {
-						global.OnlineMap[uid].ReadChannel <- *message
-						err := dao.InsertAndCacheData(db, cli, *message)
-						if err != nil {
-							return
+					} else {
+						if uid == message.FromId {
+							err := dao.InsertAndCacheData(db, cli, *message)
+							if err != nil {
+								return
+							}
 						}
+						global.OnlineMap[uid].ReadChannel <- *message
 					}
 				}
 			}

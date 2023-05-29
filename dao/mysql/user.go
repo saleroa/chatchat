@@ -26,6 +26,7 @@ func AddUser(ctx context.Context, username, password, nickname string, ID int64)
 		span.SetTag("error", true)
 		span.SetTag("error_info", err)
 		fmt.Printf("insert failed, err:%v\n", err)
+		global.Logger.Error(err.Error())
 		return false, err.Error()
 	}
 	log.Println("insert success")
@@ -42,6 +43,7 @@ func SelectID(ctx context.Context, username string) int64 {
 		span.SetTag("error", true)
 		span.SetTag("error_info", err)
 		fmt.Printf("scan failed, err:%v\n", err)
+		global.Logger.Error(err.Error())
 		return 0
 	}
 	return u.ID
@@ -59,6 +61,7 @@ func ChangePassword(ctx context.Context, st model.User) (bool, string) {
 		span.SetTag("error", true)
 		span.SetTag("error_info", err)
 		fmt.Printf("update failed, err:%v\n", err)
+		global.Logger.Error(err.Error())
 		return false, "update failed"
 	}
 	log.Println("update success")
@@ -73,6 +76,7 @@ func ChangeNickname(ctx context.Context, st model.User) (bool, string) {
 		span.SetTag("error", true)
 		span.SetTag("error_info", err.Error())
 		fmt.Printf("update failed, err:%v\n", err)
+		global.Logger.Error(err.Error())
 		return false, "update failed"
 	}
 	log.Println("update success")
@@ -87,6 +91,7 @@ func ChangeIntroduction(ctx context.Context, st model.User) (bool, string) {
 		span.SetTag("error", true)
 		span.SetTag("error_info", fmt.Sprintf("change introduction failed,error is %s", err))
 		fmt.Printf("update failed, err:%v\n", err)
+		global.Logger.Error(err.Error())
 		return false, "update failed"
 	}
 	log.Println("update success")
@@ -101,6 +106,7 @@ func ChangeAvatar(ctx context.Context, st model.User) (bool, string) {
 		span.SetTag("error", true)
 		span.SetTag("error_info", fmt.Sprintf("change avatar failed,err is %s", err))
 		fmt.Printf("update failed, err:%v\n", err)
+		global.Logger.Error(err.Error())
 		return false, "update failed"
 	}
 	log.Println("update success")

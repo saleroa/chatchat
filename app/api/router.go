@@ -8,13 +8,15 @@ import (
 )
 
 func InitRouter() error {
-	tracer := opentracing.GlobalTracer()
-	span := tracer.StartSpan("span_root")
-	defer span.Finish()
+	tracer, _, err := middleware.InitJaeger("chatchat")
+	if err != nil {
+		//global.Logger.Fatal("initialize jaeger failed", zap.Error(err))
+	}
+	opentracing.SetGlobalTracer(tracer)
 
 	r := gin.Default()
 	r.Use(middleware.CORS())
-	r.Use(ginhttp.Middleware(opentracing.GlobalTracer()))
+	r.Use(ginhttp.Middleware(tracer))
 
 	r.POST("/register", register)
 	r.POST("/login", login)
@@ -72,7 +74,7 @@ func InitRouter() error {
 	}
 	r.GET("/chat/conn", GetConn)
 
-	err := r.Run(":8088")
+	err = r.Run(":8088")
 	if err != nil {
 		return err
 	} else {

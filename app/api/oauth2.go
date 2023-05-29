@@ -49,6 +49,7 @@ func Oauth2Register(c *gin.Context) {
 	mailID, f := c.GetPostForm("mailID")
 	if f == false {
 		utils.ResponseFail(c, "verification failed")
+		return
 	}
 	var user model.OauthUser
 	c.ShouldBind(&user)
@@ -67,6 +68,7 @@ func Oauth2Register(c *gin.Context) {
 	err := redis.ZSetUserID(c, username)
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
+		return
 	}
 	redis.HSet(c, "Oauth2User", user.Oauth2Username, username)
 	redis.HSet(c, fmt.Sprintf("user:%s", username), "nickname", user.Nickname)
@@ -153,6 +155,7 @@ func Oauth2Pwd(c *gin.Context) {
 	password, f2 := c.GetPostForm("password")
 	if f1 == false || f2 == false {
 		utils.ResponseFail(c, "请输入账号和密码")
+		return
 	}
 	token, err := config.PasswordCredentialsToken(context.Background(), username, password)
 	if err != nil {

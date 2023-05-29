@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+
+  looklook:
+    image: violapioggia/chatchat
+    container_name: chatchat
+    environment:
+      TZ: Asia/Shanghai
+      GOPROXY: https://goproxy.cn,direct
+    working_dir: /go/chatchat
+    volumes:
+      - .:/go/chatchat
+    privileged: true
+    restart: always

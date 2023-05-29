@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"chatchat/app/global"
 	"chatchat/dao/mysql"
 	rdb "chatchat/dao/redis"
 	"chatchat/model"
@@ -8,7 +9,6 @@ import (
 
 	"database/sql"
 	"github.com/go-redis/redis/v8"
-	"log"
 )
 
 func InsertAndCacheData(db *sql.DB, cli *redis.Client, message model.Message) error {
@@ -23,12 +23,12 @@ func InsertAndCacheData(db *sql.DB, cli *redis.Client, message model.Message) er
 		// 插入新数据到 MySQL 中
 		err := mysql.InsertIntoMysql(db, message, key)
 		if err != nil {
-			log.Println(err)
+			global.Logger.Error(err.Error())
 			return err
 		}
 		err = rdb.InsertIntoRedis(cli, message, key)
 		if err != nil {
-			log.Println(err)
+			global.Logger.Error(err.Error())
 			return err
 		}
 	} else if message.SendType == 2 {
@@ -36,12 +36,12 @@ func InsertAndCacheData(db *sql.DB, cli *redis.Client, message model.Message) er
 		// 插入新数据到 MySQL 中
 		err := mysql.InsertIntoMysql(db, message, key)
 		if err != nil {
-			log.Println(err)
+			global.Logger.Error(err.Error())
 			return err
 		}
 		err = rdb.InsertIntoRedis(cli, message, key)
 		if err != nil {
-			log.Println(err)
+			global.Logger.Error(err.Error())
 			return err
 		}
 	}

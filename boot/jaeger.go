@@ -10,7 +10,6 @@ import (
 
 func JaegerSetup() {
 	tracer, closer, err := InitJaeger("chatchat")
-	//tracer.StartSpan("root_tracer")
 	if err != nil {
 		global.Logger.Fatal("initialize jaeger failed", zap.Error(err))
 	}

@@ -23,9 +23,9 @@ database:
   redis:
     addr: localhost
     port: 6379
-    username: root
-    password:
-    db: 1
+    username:
+    password: wzy20040525
+    db: 0
     poolSize: 10000
 
 session:

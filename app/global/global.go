@@ -4,8 +4,6 @@ import (
 	"chatchat/app/internal/model/config"
 	"chatchat/model"
 	"database/sql"
-	"errors"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -50,18 +48,19 @@ var (
 		},
 	}
 )
-var Secret = []byte("WZY")
 
-func ParseToken(tokenString string) (*model.MyClaims, error) {
-	// 解析token
-	token, err := jwt.ParseWithClaims(tokenString, &model.MyClaims{}, func(token *jwt.Token) (i interface{}, err error) {
-		return Secret, nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if claims, ok := token.Claims.(*model.MyClaims); ok && token.Valid { // 校验token
-		return claims, nil
-	}
-	return nil, errors.New("invalid token")
-}
+//var Secret = []byte("WZY")
+//
+//func ParseToken(tokenString string) (*model.MyClaims, error) {
+//	// 解析token
+//	token, err := jwt.ParseWithClaims(tokenString, &model.MyClaims{}, func(token *jwt.Token) (i interface{}, err error) {
+//		return Secret, nil
+//	})
+//	if err != nil {
+//		return nil, err
+//	}
+//	if claims, ok := token.Claims.(*model.MyClaims); ok && token.Valid { // 校验token
+//		return claims, nil
+//	}
+//	return nil, errors.New("invalid token")
+//}

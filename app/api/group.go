@@ -155,7 +155,10 @@ func KickOut(c *gin.Context) {
 }
 
 func SearchGroup(c *gin.Context) {
-
+	Size := c.PostForm("size")
+	size, _ := strconv.ParseInt(Size, 10, 64)
+	Offset := c.PostForm("offset")
+	offset, _ := strconv.ParseInt(Offset, 10, 64)
 	name, flag := c.GetPostForm("group_name")
 	if flag == false {
 		utils.ResponseFail(c, "请输入要查找的群聊名字")
@@ -165,16 +168,50 @@ func SearchGroup(c *gin.Context) {
 	db := global.MysqlDB
 	var group model.Group
 	group.Name = name
-	err := db.QueryRow("select gid, created_at  from `groups` where group_name = ? ", name).Scan(&group.Id, &group.Time)
+	query := "SELECT * FROM `groups` WHERE group_name LIKE ?"
+	rows, err := db.Query(query, "%"+name+"%")
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
 	}
+	defer rows.Close()
 
-	c.JSON(200, gin.H{
-		"status": 200,
-		"group":  group,
-	})
+	var (
+		groups []model.Group
+		i      int64
+	)
+	// 遍历查询结果
+	for rows.Next() {
+		// 读取每行数据
+		err := rows.Scan(&group.Id, &group.Name, &group.Time)
+		if err != nil {
+			fmt.Println("读取数据失败:", err)
+			return
+		}
+		//err = db.QueryRow("select gid, created_at  from `groups` where group_name = ? ", group.Name).Scan(&group.Id, &group.Time)
+		//if err != nil {
+		//	utils.ResponseFail(c, err.Error())
+		//	return
+		//}
+		groups = append(groups, group)
+		i++
+	}
+	if (offset+1)*size <= i {
+		c.JSON(200, gin.H{
+			"status": 200,
+			"group":  groups[offset*size : (offset+1)*size],
+		})
+	} else if offset*size > i {
+		c.JSON(200, gin.H{
+			"status": 200,
+			"group":  "NULL",
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"status": 200,
+			"group":  groups[offset*size : i],
+		})
+	}
 }
 
 func GetMembers(c *gin.Context) {
