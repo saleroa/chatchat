@@ -216,9 +216,6 @@ func ChangeAvatar(c *gin.Context) {
 			break
 		}
 	}
-	user.Username = username.(string)
-	num := username.(string)[:i]
-	user.Avatar = "http://test.violapioggia.cn/chatchatUsers/" + num + "%40" + "qq.com"
 	err := c.Request.ParseMultipartForm(32 << 20)
 	if err != nil {
 		// 处理错误
@@ -227,15 +224,18 @@ func ChangeAvatar(c *gin.Context) {
 	}
 
 	// 获取上传的文件
-	avatar, _, err := c.Request.FormFile("image")
+	avatar, file, err := c.Request.FormFile("image")
 	if err != nil {
 		// 处理错误
 		utils.ResponseFail(c, err.Error())
 		return
 	}
+	user.Username = username.(string)
+	num := username.(string)[:i]
+	user.Avatar = "http://test.violapioggia.cn/chatchatUsers/" + num + "%40" + "qq.com" + "/" + file.Filename
 	defer avatar.Close()
 	err = utils.Delete(username.(string))
-	err = utils.Upload(avatar, username.(string))
+	err = utils.Upload(avatar, username.(string), file.Filename)
 	if err != nil {
 		utils.ResponseFail(c, fmt.Sprintf("change avatar failed,err:%s", err.Error()))
 		return
@@ -245,7 +245,11 @@ func ChangeAvatar(c *gin.Context) {
 		utils.ResponseFail(c, "update avatar failed")
 	}
 	redis.HSet(c, fmt.Sprintf("user:%s", username), "avatar", user.Avatar)
-	utils.ResponseSuccess(c, "change avatar success")
+	c.JSON(http.StatusOK, gin.H{
+		"status":  200,
+		"message": "change avatar success",
+		"url":     user.Avatar,
+	})
 	return
 }
 func ChangeIntroduction(c *gin.Context) {

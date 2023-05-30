@@ -14,7 +14,7 @@ type FormUploadConfig struct {
 	Options        map[string]interface{}   // 更多自定义参数
 }
 
-func Upload(w io.Reader, filename string) error {
+func Upload(w io.Reader, username, filename string) error {
 	up := upyun.NewUpYun(&upyun.UpYunConfig{
 		Bucket:   "image-chatchat",
 		Operator: "ziyu",
@@ -22,7 +22,7 @@ func Upload(w io.Reader, filename string) error {
 	})
 	err := up.Put(&upyun.PutObjectConfig{
 		Reader: w,
-		Path:   "/chatchatUsers/" + filename,
+		Path:   "/chatchatUsers/" + username + "/" + filename,
 	})
 	if err != nil {
 		return err

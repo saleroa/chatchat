@@ -109,7 +109,6 @@ func ChangeAvatar(ctx context.Context, st model.User) (bool, string) {
 		global.Logger.Error(err.Error())
 		return false, "update failed"
 	}
-	log.Println("update success")
 	return true, ""
 }
 

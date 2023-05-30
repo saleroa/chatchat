@@ -182,7 +182,11 @@ func Oauth2Pwd(c *gin.Context) {
 	//println(bodyBytes)
 	//println(user)
 	//io.Copy(c.Writer, resp.Body)
-	username1, _ := redis.HGet(c, "Oauth2User", strconv.FormatInt(user.Oauth2Username, 10))
+	username1, err := redis.HGet(c, "Oauth2User", strconv.FormatInt(user.Oauth2Username, 10))
+	if err != nil {
+		utils.ResponseFail(c, "wrong password")
+		return
+	}
 	if username1 != "" {
 		userID, _ := redis.HGet(c.Request.Context(), fmt.Sprintf("user:%s", username1), "id")
 		id, _ := strconv.ParseInt(userID.(string), 10, 64)

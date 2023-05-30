@@ -156,22 +156,25 @@ func GWrite() {
 
 // 上线后第一件事，读取离线消息
 func GetOfflineMessage(c *gin.Context) {
-	ID, _ := c.Get("id")
-	id, _ := ID.(int)
-	fmt.Println(id)
+	v, _ := c.Get("id")
+	ID, _ := v.(int64)
+	id := int(ID)
+	//username, _ := c.Get("username")
+	//fmt.Println(username)
+	//fmt.Println(ID)
+	//fmt.Println(id)
 	cli := global.Rdb
-	len, err := cli.LLen(context.Background(), strconv.Itoa(id)).Result()
+	len, err := cli.LLen(c.Request.Context(), strconv.Itoa(id)).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
 	}
-	result, err := cli.LRange(context.Background(), strconv.Itoa(id), 0, len-1).Result()
+	result, err := cli.LRange(c.Request.Context(), strconv.Itoa(id), 0, len-1).Result()
 	if err != nil {
 		utils.ResponseFail(c, err.Error())
 		return
 	}
-	defer cli.Del(context.Background(), strconv.Itoa(id))
-
+	defer cli.Del(c.Request.Context(), strconv.Itoa(id))
 	for _, res := range result {
 		var s model.Message
 		if err := json.Unmarshal([]byte(res), &s); err != nil {

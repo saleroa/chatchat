@@ -4,23 +4,16 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: update function of getMessage">
+    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: add docker &amp;&amp; fix some bugs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/chat.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/group.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/group.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/oauth2.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/oauth2.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/router.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/global/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/jaeger.go" beforeDir="false" afterPath="$PROJECT_DIR$/boot/jaeger.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/main" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/insertandcachedata.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/insertandcachedata.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/mysql/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/mysql/chat.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/mysql/oauth2.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/mysql/oauth2.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dao/mysql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/mysql/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/redis/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/redis/chat.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dao/redis/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/redis/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/upyun.go" beforeDir="false" afterPath="$PROJECT_DIR$/utils/upyun.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -171,7 +164,8 @@
     <MESSAGE value="feat: update a lot" />
     <MESSAGE value="feat: update" />
     <MESSAGE value="feat: update function of getMessage" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update function of getMessage" />
+    <MESSAGE value="feat: add docker &amp;&amp; fix some bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add docker &amp;&amp; fix some bugs" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
