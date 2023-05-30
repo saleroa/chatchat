@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: add docker &amp;&amp; fix some bugs">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/chat.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/oauth2.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/oauth2.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/main" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/mysql/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/mysql/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/redis/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/redis/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/upyun.go" beforeDir="false" afterPath="$PROJECT_DIR$/utils/upyun.go" afterDir="false" />
-    </list>
+    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: add README.md &amp;&amp; fix some bugs" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -165,7 +155,8 @@
     <MESSAGE value="feat: update" />
     <MESSAGE value="feat: update function of getMessage" />
     <MESSAGE value="feat: add docker &amp;&amp; fix some bugs" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add docker &amp;&amp; fix some bugs" />
+    <MESSAGE value="feat: add README.md &amp;&amp; fix some bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add README.md &amp;&amp; fix some bugs" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
