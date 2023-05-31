@@ -8,10 +8,10 @@ logger:
 
 database:
   mysql:
-    addr: 162.14.78.209
+    addr: 
     port: 3306
     username: root
-    password: wzy20040525
+    password: 
     db: chatroom_users
     charset: utf8mb4
     connMaxIdleTime: 1h
@@ -21,10 +21,10 @@ database:
     maxOpenConns: 5
 
   redis:
-    addr: 162.14.78.209
+    addr: 
     port: 6379
     username:
-    password: wzy20040525
+    password: 
     db: 0
     poolSize: 10000
 
