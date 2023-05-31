@@ -8,7 +8,7 @@ logger:
 
 database:
   mysql:
-    addr: localhost
+    addr: 162.14.78.209
     port: 3306
     username: root
     password: wzy20040525
@@ -21,7 +21,7 @@ database:
     maxOpenConns: 5
 
   redis:
-    addr: localhost
+    addr: 162.14.78.209
     port: 6379
     username:
     password: wzy20040525
