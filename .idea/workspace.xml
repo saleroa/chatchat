@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: fix README.md">
+    <list default="true" id="6628bd43-2727-40ae-a9d9-baa5e599551b" name="变更" comment="feat: fix dockerfile">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/dockerfile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,7 +160,8 @@
     <MESSAGE value="feat: add docker &amp;&amp; fix some bugs" />
     <MESSAGE value="feat: add README.md &amp;&amp; fix some bugs" />
     <MESSAGE value="feat: fix README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: fix README.md" />
+    <MESSAGE value="feat: fix dockerfile" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: fix dockerfile" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
