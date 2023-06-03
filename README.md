@@ -66,6 +66,22 @@
 - 云储存图片，节省空间
 
   ![image-20230602113403012](./images/image-20230602113403012.png)
+  
+- 基于Oauth2的自定义第三方登录，实现了两种登录方式
+
+  1，用code换取token，安全性更高
+  
+  ![img](https://upload-images.jianshu.io/upload_images/9173561-cf2e57e89aa63a95.png?imageMogr2/auto-orient/strip|imageView2/2/w/1010/format/webp)
+  
+  2，用pwd直接换取token，可用于受信任的项目
+  
+  
+  
+  
+
+> 详情请见源码和接口文档
+
+
 
 ### 技术栈
 
@@ -74,19 +90,25 @@
 > Gin 是一个用 Go (Golang) 编写的 Web 框架。
 >
 
-    本项目功能不是很繁杂，所以用不上微服务，所以采用了写单体比较合适的gin框架
+```
+本项目功能不是很繁杂，所以用不上微服务，所以采用了写单体比较合适的gin框架
+```
 
 - [mysql](https://www.mysql.com/)
 
 > 一个关系型数据库管理系统，由瑞典MySQL AB 公司开发，属于 Oracle 旗下产品。MySQL 是最流行的关系型数据库管理系统关系型数据库管理系统之一，在 WEB 应用方面，MySQL是最好的 RDBMS (Relational Database Management System，关系数据库管理系统) 应用软件之一
 
-    遇事不决还得是mysql，以后重构可以考虑mongodb
+```
+遇事不决还得是mysql，以后重构可以考虑mongodb
+```
 
 - [redis](https://redis.io/)
 
 > 一个开源的、使用C语言编写的、支持网络交互的、可基于内存也可持久化的Key-Value数据库
 
-    缓存存储还是选型最普遍的redis
+```
+缓存存储还是选型最普遍的redis
+```
 
 - [sentinel](https://sentinelguard.io/zh-cn/)
 
